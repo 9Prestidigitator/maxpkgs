@@ -18,9 +18,9 @@
       amplocker = pkgs.callPackage ./pkgs/amplocker.nix {};
     };
     overlays.default = final: prev: {
-      bitwig6 = self.packages.bitwig-studio6;
-      overwitch = self.packages.overwitch;
-      amplocker = self.packages.amplocker;
+      bitwig6 = self.packages.${system}.bitwig-studio6;
+      overwitch = self.packages.${system}.overwitch;
+      amplocker = self.packages.${system}.amplocker;
     };
   };
 }
