@@ -24,7 +24,6 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [unzip patchelf coreutils];
-
   buildInputs = [
     steam-run-free
     alsa-lib
