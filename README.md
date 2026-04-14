@@ -14,7 +14,7 @@ Simply add this library as a flake input:
 
 ```nix
 inputs = {
-  nix-nuget-feed.url = "github:9Prestidigitator/nix-nuget-feed";
+  maxpks.url = "github:9Prestidigitator/maxpkgs";
 }
 ```
 
