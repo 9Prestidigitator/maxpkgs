@@ -14,7 +14,7 @@ Simply add this library as a flake input:
 
 ```nix
 inputs = {
-  maxpks.url = "github:9Prestidigitator/maxpkgs";
+  maxpkgs.url = "github:9Prestidigitator/maxpkgs";
 }
 ```
 
