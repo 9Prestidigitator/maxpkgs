@@ -1,12 +1,13 @@
 # maxpkgs
 
-A collection of nix packages and modules I commonly use that aren't always available or up to date in other sources.
+A collection of `x86_64-linux` nix packages and modules I commonly use that aren't always available or up to date in other sources.
 
 ## Packages
 
 - Bitwig Studio 6.0.3
 - Overwitch
 - Amplocker
+- Eden Emulator v0.2.0-rc2
 
 ## Usage
 
@@ -30,13 +31,11 @@ To use the derivations via `pkgs`.
 environment.systemPackages = with pkgs; [
   bitwig6
   overwitch
-  amplocker
 ];
 ```
 
 You can also reference packages directly via `nix` cli.
 
-- `nix run github:9Prestidigitator/maxpkgs#bitwig6`
 - `nix run github:9Prestidigitator/maxpkgs#overwitch`
 - `nix run github:9Prestidigitator/maxpkgs#amplocker`
 
@@ -44,11 +43,14 @@ Or as direct package references.
 
 ```nix
 environment.systemPackages = with pkgs; [
-  inputs.maxpkgs.packages.${system}.bitwig6
   inputs.maxpkgs.packages.${system}.overwitch
   inputs.maxpkgs.packages.${system}.amplocker
 ];
 ```
+
+## Plans
+
+Will add aarch package support when I get an arm device.
 
 ## Inspirations
 
