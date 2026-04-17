@@ -4,7 +4,7 @@ A collection of `x86_64-linux` nix packages and modules I commonly use that aren
 
 ## Packages
 
-- Bitwig Studio 6.0.3
+- Bitwig Studio 6.0.4
 - Overwitch
 - Amplocker
 - Eden Emulator v0.2.0-rc2
