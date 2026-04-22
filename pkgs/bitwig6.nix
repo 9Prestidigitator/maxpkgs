@@ -37,7 +37,7 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "bitwig-studio6";
-  version = "6.0.4";
+  version = "6.0.5";
 
   src = fetchurl {
     name = "bitwig-studio-${finalAttrs.version}.deb";
