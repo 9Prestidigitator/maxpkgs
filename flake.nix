@@ -3,26 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:vic/import-tree";
   };
 
-  outputs = {self, nixpkgs, ...}: let
-    system = "x86_64-linux";
-    pkgs = import nixpkgs {
-      inherit system;
-      config.allowUnfree = true;
-    };
-  in {
-    packages.${system} = {
-      bitwig-studio6 = pkgs.callPackage ./pkgs/bitwig6.nix {};
-      overwitch = pkgs.callPackage ./pkgs/overwitch.nix {};
-      amplocker = pkgs.callPackage ./pkgs/amplocker.nix {};
-      eden = pkgs.callPackage ./pkgs/eden.nix {};
-    };
-    overlays.default = final: prev: {
-      bitwig6 = self.packages.${system}.bitwig-studio6;
-      overwitch = self.packages.${system}.overwitch;
-      amplocker = self.packages.${system}.amplocker;
-      eden = self.packages.${system}.eden;
-    };
-  };
+  outputs = inputs:
+    inputs.flake-parts.lib.mkFlake {inherit inputs;} (inputs.import-tree ./modules);
 }

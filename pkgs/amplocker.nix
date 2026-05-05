@@ -16,7 +16,7 @@
 }:
 stdenv.mkDerivation {
   pname = "Amp Locker";
-  version = "1.0.9";
+  version = "1.5.1";
 
   src = fetchurl {
     url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerLinux.zip";
@@ -78,7 +78,7 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "AudioAssault Amp Locker";
     homepage = "https://audioassault.mx/";
-    platforms = platforms.all;
+    platforms = ["x86_64-linux"];
     maintainers = with maintainers; [polygon];
     mainProgram = "Amp_Locker_Standalone";
     license = licenses.unfree;

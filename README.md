@@ -1,6 +1,6 @@
 # maxpkgs
 
-A collection of `x86_64-linux` nix packages and modules I commonly use that aren't always available or up to date in other sources.
+A collection of nix packages and modules I commonly use that aren't always available or up to date in other sources.
 
 ## Packages
 
@@ -50,7 +50,7 @@ environment.systemPackages = with pkgs; [
 
 ## Plans
 
-Will add aarch package support when I get an arm device.
+Will add better aarch package support when I get an arm device.
 
 ## Inspirations
 

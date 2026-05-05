@@ -1,0 +1,46 @@
+{self, ...}: {
+  flake.nixosModules.overwitch = {
+    config,
+    lib,
+    pkgs,
+    ...
+  }: let
+    cfg = config.services.overwitch;
+  in {
+    options.services.overwitch = {
+      enable = lib.mkEnableOption "Overwitch Overbridge daemon";
+
+      package = lib.mkOption {
+        type = lib.types.package;
+        default = self.packages.${pkgs.stdenv.hostPlatform.system}.overwitch;
+        description = "Overwitch package to use";
+      };
+    };
+
+    config = lib.mkIf cfg.enable {
+      environment.systemPackages = [cfg.package];
+      services = {
+        udev.packages = [cfg.package];
+        udev.extraRules = ''
+          SUBSYSTEM=="usb", ATTR{idVendor}=="1935", MODE="0666"
+        '';
+      };
+
+      systemd.user.services.overwitch = {
+        description = "Overwitch service";
+
+        after = ["pipewire.service"];
+        requires = ["pipewire.service"];
+
+        serviceConfig = {
+          Type = "notify-reload";
+          GuessMainPID = true;
+          ExecStart = "${cfg.package}/bin/overwitch-service";
+          Restart = "on-failure";
+        };
+
+        wantedBy = ["default.target"];
+      };
+    };
+  };
+}

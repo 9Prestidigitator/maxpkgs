@@ -208,7 +208,6 @@ in
     meta = {
       description = "Switch 1 emulator derived from Yuzu and Sudachi";
       homepage = "https://eden-emu.dev/";
-      mainProgram = "eden";
       maintainers = with lib.maintainers; [marcin-serwin];
       license = with lib.licenses; [
         # Primary
@@ -239,8 +238,7 @@ in
         mpl20
         wtfpl
       ];
-      platforms = [
-        "x86_64-linux"
-      ];
+      platforms = lib.platforms.linux;
+      mainProgram = "eden";
     };
   })
