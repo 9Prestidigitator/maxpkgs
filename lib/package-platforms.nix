@@ -8,11 +8,9 @@ in
     amplocker = callPackage ../pkgs/amplocker.nix {};
     bitwig6 = callPackage ../pkgs/bitwig6.nix {};
     eden = callPackage ../pkgs/eden.nix {};
-    nueral-amp-modeler = callPackage ../pkgs/nueral-amp-modeler.nix {};
     overwitch = callPackage ../pkgs/overwitch.nix {};
   }
   // lib.optionalAttrs (availableOn ["aarch64-linux"]) {
-    nueral-amp-modeler = callPackage ../pkgs/nueral-amp-modeler.nix {};
     overwitch = callPackage ../pkgs/overwitch.nix {};
     eden = callPackage ../pkgs/eden.nix {};
   }
