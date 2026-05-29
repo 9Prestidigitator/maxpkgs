@@ -37,12 +37,12 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "bitwig-studio6";
-  version = "6.0.6";
+  version = "6.0.7";
 
   src = fetchurl {
     name = "bitwig-studio-${finalAttrs.version}.deb";
     url = "https://www.bitwig.com/dl/Bitwig%20Studio/${finalAttrs.version}/installer_linux";
-    hash = "sha256-tczgtA4v3a5Qjxaa6ZvaiFDWD6dhRw19vj8IMxkyCNI=";
+    hash = "sha256-FantrFBb9Tl27mHZ28Mpm4rDQ/Sd2nAevGsKUfInZAI=";
   };
 
   strictDeps = true;
