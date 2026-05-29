@@ -4,7 +4,7 @@ A collection of nix packages and modules I commonly use that aren't always avail
 
 ## Packages
 
-- Bitwig Studio 6.0.6
+- Bitwig Studio 6.0.7
 - Overwitch
 - Amplocker
 - Eden Emulator v0.2.0-rc2
