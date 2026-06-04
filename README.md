@@ -6,8 +6,11 @@ A collection of nix packages and modules I commonly use that aren't always avail
 
 - Bitwig Studio 6.0.7
 - Overwitch
-- Amplocker
 - Eden Emulator v0.2.0-rc2
+- Amplocker
+- Pianoteq 9
+- GVST Suite
+- Neural Amp Modeler LV2
 
 ## Usage
 
