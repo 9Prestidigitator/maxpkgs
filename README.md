@@ -4,14 +4,15 @@ A collection of nix packages and modules I commonly use that aren't always avail
 
 ## Packages
 
-- Bitwig Studio 6.0.7
+- Bitwig Studio 6.0.8
 - Overwitch
-- Eden Emulator v0.2.0-rc2
-- Amplocker
 - Pianoteq 9
 - GVST Suite
 - Neural Amp Modeler LV2 v0.2.0
+- JS_Inflator v2.0.3.2
 - rubberband
+- Amplocker
+- Eden Emulator v0.2.0 (nixpkgs is up to date)
 
 ## Usage
 
