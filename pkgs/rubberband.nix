@@ -12,6 +12,7 @@
   ladspa-header,
   meson,
   ninja,
+  python3,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "rubberband";
@@ -27,6 +28,7 @@ stdenv.mkDerivation (finalAttrs: {
     meson
     ninja
     jdk_headless
+    python3
   ];
   buildInputs = [
     libsamplerate
@@ -42,6 +44,42 @@ stdenv.mkDerivation (finalAttrs: {
   # to find libboost_unit_test_framework.a.)
   mesonFlags = ["-Dtests=disabled"];
   doCheck = false;
+
+  postPatch = ''
+    python3 - <<'PY'
+    from pathlib import Path
+    import re
+
+    ttl = Path("ladspa-lv2/rubberband.lv2/lv2-rubberband.ttl")
+    text = ttl.read_text()
+
+    port_names = [
+        "latencyPort",
+        "centsPort",
+        "semitonesPort",
+        "octavesPort",
+        "crispnessPort",
+        "formantPort",
+        "formantPortR3",
+        "wetDryPort",
+        "wetDryPortR3",
+    ]
+
+    ports = {}
+    for name in port_names:
+        match = re.search(rf"^:{name}\n(?P<body>(?:        .*\n)*?        .* \.)\n", text, re.MULTILINE)
+        if match is None:
+            raise RuntimeError(f"failed to find LV2 port definition for {name}")
+        body = match.group("body").rstrip()
+        body = body.removesuffix(" .")
+        ports[name] = f"[{body}\n                 ]"
+
+    for name, replacement in ports.items():
+        text = text.replace(f":{name} ,", f"{replacement} ,")
+
+    ttl.write_text(text)
+    PY
+  '';
 
   meta = {
     description = "High quality software library for audio time-stretching and pitch-shifting";

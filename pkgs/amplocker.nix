@@ -13,7 +13,6 @@
   glibc_multi,
   patchelf,
   coreutils,
-  perl,
 }:
 stdenv.mkDerivation {
   pname = "Amp Locker";
@@ -24,7 +23,7 @@ stdenv.mkDerivation {
     sha256 = "sha256-ZONs5l1ecuoUqeWTAoWyAZzBOl9DecTs3/zvkTRP8nw=";
   };
 
-  nativeBuildInputs = [unzip patchelf coreutils perl];
+  nativeBuildInputs = [unzip patchelf coreutils];
   buildInputs = [
     steam-run-free
     alsa-lib
@@ -60,7 +59,7 @@ stdenv.mkDerivation {
     data_home="\$HOME/Audio Assault/PluginData/Audio Assault/AmpLockerData"
     mkdir -p "\$data_home"
     ${coreutils}/bin/ln -sfn "$out/Audio Assault/AmpLockerData/newgfx.dat" "\$data_home/newgfx.dat"
-    ${coreutils}/bin/cp -rsn --no-preserve=mode "$out/Audio Assault/AmpLockerData"/. "\$data_home"/
+    ${coreutils}/bin/cp -rsf --no-preserve=mode "$out/Audio Assault/AmpLockerData"/. "\$data_home"/
 
     ${steam-run-free}/bin/steam-run "$out/bin/.Amp_Locker_Standalone_unwrapped" "\$@"
     EOF
@@ -84,7 +83,6 @@ stdenv.mkDerivation {
       $out/lib/lv2/"Amp Locker.lv2"/"Amp Locker.so" \
       $out/lib/vst3/"Amp Locker.vst3"/Contents/x86_64-linux/"Amp Locker.so"
     do
-      perl -0pi -e 's|\Q~/Audio Assault/PluginData/\E|"/run/current-system/sw/" . ("\0" x 4)|ge' "$plugin"
       patchelf --add-rpath ${libraryPath} "$plugin"
     done
   '';
