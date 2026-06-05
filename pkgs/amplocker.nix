@@ -62,8 +62,7 @@ stdenv.mkDerivation {
     ${coreutils}/bin/ln -sfn "$out/Audio Assault/AmpLockerData/newgfx.dat" "\$data_home/newgfx.dat"
     ${coreutils}/bin/cp -rsn --no-preserve=mode "$out/Audio Assault/AmpLockerData"/. "\$data_home"/
 
-    HERE="\$(dirname "\$0")"
-    ${steam-run-free}/bin/steam-run "\$HERE/.Amp_Locker_Standalone_unwrapped" "\$@"
+    ${steam-run-free}/bin/steam-run "$out/bin/.Amp_Locker_Standalone_unwrapped" "\$@"
     EOF
         chmod +x $out/bin/Amp_Locker_Standalone
   '';
@@ -81,6 +80,7 @@ stdenv.mkDerivation {
     ];
   in ''
     for plugin in \
+      $out/bin/.Amp_Locker_Standalone_unwrapped \
       $out/lib/lv2/"Amp Locker.lv2"/"Amp Locker.so" \
       $out/lib/vst3/"Amp Locker.vst3"/Contents/x86_64-linux/"Amp Locker.so"
     do

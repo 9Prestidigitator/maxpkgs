@@ -43,21 +43,6 @@ stdenv.mkDerivation (finalAttrs: {
   mesonFlags = ["-Dtests=disabled"];
   doCheck = false;
 
-  postPatch = ''
-    substituteInPlace ladspa-lv2/rubberband.lv2/lv2-rubberband.ttl \
-      --replace-fail "        lv2:port :latencyPort ," "        lv2:port ( :latencyPort" \
-      --replace-fail "                 :centsPort ," "                 :centsPort" \
-      --replace-fail "                 :semitonesPort ," "                 :semitonesPort" \
-      --replace-fail "                 :octavesPort ," "                 :octavesPort" \
-      --replace-fail "                 :crispnessPort ," "                 :crispnessPort" \
-      --replace-fail "                 :formantPort ," "                 :formantPort" \
-      --replace-fail "                 :formantPortR3 ," "                 :formantPortR3" \
-      --replace-fail "                 :wetDryPort ," "                 :wetDryPort" \
-      --replace-fail "                 :wetDryPortR3 ," "                 :wetDryPortR3" \
-      --replace-fail "                 ], [" "                 ] [" \
-      --replace-fail "                 ] ." "                 ] ) ."
-  '';
-
   meta = {
     description = "High quality software library for audio time-stretching and pitch-shifting";
     homepage = "https://breakfastquay.com/rubberband/";
