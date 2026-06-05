@@ -10,7 +10,8 @@ A collection of nix packages and modules I commonly use that aren't always avail
 - Amplocker
 - Pianoteq 9
 - GVST Suite
-- Neural Amp Modeler LV2
+- Neural Amp Modeler LV2 v0.2.0
+- rubberband
 
 ## Usage
 

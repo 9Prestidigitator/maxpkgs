@@ -97,7 +97,7 @@
           done
         done
 
-        install -Dm644 ${./pianoteq.svg} $out/share/icons/hicolor/scalable/apps/pianoteq.svg
+        install -Dm644 ${../assets/pianoteq.svg} $out/share/icons/hicolor/scalable/apps/pianoteq.svg
         for size in 16 22 32 48 64 128 256; do
           dir=$out/share/icons/hicolor/"$size"x"$size"/apps
           mkdir -p $dir
@@ -106,7 +106,7 @@
             --width $size \
             --height $size \
             --output $dir/pianoteq.png \
-            ${./pianoteq.svg}
+            ${../assets/pianoteq.svg}
         done
         runHook postInstall
       '';
