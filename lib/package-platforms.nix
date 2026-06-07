@@ -5,7 +5,7 @@
   pianoteqPackages = callPackage ../pkgs/pianoteq.nix {};
 in
   {}
-  // lib.optionalAttrs (availableOn ["x86_64-linux"]) {
+  // lib.optionalAttrs (availableOn ["x86_64-linux"]) rec {
     amplocker = callPackage ../pkgs/amplocker.nix {};
     bitwig6 = callPackage ../pkgs/bitwig6.nix {};
     eden = callPackage ../pkgs/eden.nix {};
@@ -18,6 +18,8 @@ in
     pianoteq-stage = pianoteqPackages.stage_9;
     pianoteq-trial = pianoteqPackages."standard-trial_9";
     rubberband = callPackage ../pkgs/rubberband.nix {};
+    libonnxruntime-neuralnote = callPackage ../pkgs/neuralnote/libonnxruntime-neuralnote.nix {};
+    neuralnote = callPackage ../pkgs/neuralnote/neuralnote.nix {};
   }
   // lib.optionalAttrs (availableOn ["aarch64-linux"]) {
     overwitch = callPackage ../pkgs/overwitch.nix {};
