@@ -5,7 +5,7 @@
   pianoteqPackages = callPackage ../pkgs/pianoteq.nix {};
 in
   {}
-  // lib.optionalAttrs (availableOn ["x86_64-linux"]) rec {
+  // lib.optionalAttrs (availableOn ["x86_64-linux"]) {
     amplocker = callPackage ../pkgs/amplocker.nix {};
     bitwig6 = callPackage ../pkgs/bitwig6.nix {};
     eden = callPackage ../pkgs/eden.nix {};
