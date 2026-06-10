@@ -31,6 +31,7 @@ stdenv.mkDerivation {
     patchelf
     coreutils
   ];
+
   buildInputs = [
     steam-run-free
     alsa-lib
@@ -62,22 +63,22 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
-        runHook preInstall
+    runHook preInstall
 
-        unzip -q "$src" -d .
-        rm -rf __MACOSX
-        mkdir -p $out
-        mkdir -p $out/bin
-        mkdir -p $out/lib/lv2
-        mkdir -p $out/lib/vst3
-        mkdir -p $out/"Audio Assault"
-        cp -r "Amp Locker Standalone" $out/bin/".Amp_Locker_Standalone_unwrapped"
-        cp -r "Amp Locker.lv2" $out/lib/lv2/
-        cp -r "Amp Locker.vst3" $out/lib/vst3/
-        cp -r "AmpLockerData" $out/"Audio Assault"/
+    unzip -q "$src" -d .
+    rm -rf __MACOSX
+    mkdir -p $out
+    mkdir -p $out/bin
+    mkdir -p $out/lib/lv2
+    mkdir -p $out/lib/vst3
+    mkdir -p $out/"Audio Assault"
+    cp -r "Amp Locker Standalone" $out/bin/".Amp_Locker_Standalone_unwrapped"
+    cp -r "Amp Locker.lv2" $out/lib/lv2/
+    cp -r "Amp Locker.vst3" $out/lib/vst3/
+    cp -r "AmpLockerData" $out/"Audio Assault"/
 
-        # Wrap the standalone with steam-run, it seems to segfault otherwise trying to access FHS paths
-        cat > $out/bin/Amp_Locker_Standalone <<EOF
+    # Wrap the standalone with steam-run, it seems to segfault otherwise trying to access FHS paths
+    cat > $out/bin/Amp_Locker_Standalone <<EOF
     #!/usr/bin/env sh
     data_home="\$HOME/Audio Assault/PluginData/Audio Assault/AmpLockerData"
     mkdir -p "\$data_home"
@@ -86,9 +87,9 @@ stdenv.mkDerivation {
 
     ${steam-run-free}/bin/steam-run "$out/bin/.Amp_Locker_Standalone_unwrapped" "\$@"
     EOF
-        chmod +x $out/bin/Amp_Locker_Standalone
+    chmod +x $out/bin/Amp_Locker_Standalone
 
-        runHook postInstall
+    runHook postInstall
   '';
 
   preFixup = let

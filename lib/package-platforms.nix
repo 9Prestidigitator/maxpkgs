@@ -8,6 +8,7 @@ in
   // lib.optionalAttrs (availableOn ["x86_64-linux"]) {
     amplocker = callPackage ../pkgs/amplocker.nix {};
     bitwig6 = callPackage ../pkgs/bitwig6.nix {};
+    drumlocker = callPackage ../pkgs/drumlocker.nix {};
     eden = callPackage ../pkgs/eden.nix {};
     gvst = callPackage ../pkgs/gvst.nix {};
     js-inflator = callPackage ../pkgs/js-inflator.nix {};
