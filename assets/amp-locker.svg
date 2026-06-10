@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="case" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#303238"/>
+      <stop offset="1" stop-color="#111216"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c8a66e"/>
+      <stop offset="0.52" stop-color="#f0d9a6"/>
+      <stop offset="1" stop-color="#9b7441"/>
+    </linearGradient>
+    <linearGradient id="knob" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f1df"/>
+      <stop offset="0.42" stop-color="#c3aa77"/>
+      <stop offset="1" stop-color="#5f4529"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="url(#case)"/>
+  <rect x="12" y="16" width="104" height="96" rx="10" fill="#202126"/>
+  <rect x="20" y="24" width="88" height="20" rx="4" fill="#111216"/>
+  <rect x="20" y="50" width="88" height="44" rx="5" fill="url(#panel)"/>
+  <rect x="20" y="98" width="88" height="6" rx="3" fill="#0e0f12"/>
+  <path d="M30 35h28" stroke="#d7d3c5" stroke-width="5" stroke-linecap="round"/>
+  <path d="M70 32h24M70 39h24" stroke="#595b60" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="36" cy="74" r="11" fill="url(#knob)"/>
+  <circle cx="64" cy="74" r="11" fill="url(#knob)"/>
+  <circle cx="92" cy="74" r="11" fill="url(#knob)"/>
+  <path d="M36 66v7M64 66v7M92 66v7" stroke="#21170d" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="30" cy="58" r="3" fill="#8b1414"/>
+  <path d="M42 31l-8 11h10l-9 14" fill="none" stroke="#f4ce64" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

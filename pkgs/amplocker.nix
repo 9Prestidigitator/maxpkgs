@@ -53,6 +53,7 @@ stdenv.mkDerivation {
       name = "amp-locker";
       exec = "Amp_Locker_Standalone";
       desktopName = "Amp Locker";
+      icon = "amp-locker";
       comment = "AudioAssault Amp Locker";
       categories = [
         "AudioVideo"
@@ -76,6 +77,7 @@ stdenv.mkDerivation {
     cp -r "Amp Locker.lv2" $out/lib/lv2/
     cp -r "Amp Locker.vst3" $out/lib/vst3/
     cp -r "AmpLockerData" $out/"Audio Assault"/
+    install -Dm644 ${../assets/amp-locker.svg} $out/share/icons/hicolor/scalable/apps/amp-locker.svg
 
     # Wrap the standalone with steam-run, it seems to segfault otherwise trying to access FHS paths
     cat > $out/bin/Amp_Locker_Standalone <<EOF
