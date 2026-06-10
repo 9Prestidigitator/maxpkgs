@@ -1,4 +1,7 @@
-{pkgs}: let
+{
+  pkgs,
+  filterByPlatform ? true,
+}: let
   inherit (pkgs) lib callPackage;
   innerPitchPackages = callPackage ../pkgs/inner-pitch.nix {};
   innerPitch = innerPitchPackages.default.overrideAttrs (oldAttrs: {
@@ -34,4 +37,6 @@
     rubberband = callPackage ../pkgs/rubberband.nix {};
   };
 in
-  availablePackages
+  if filterByPlatform
+  then availablePackages
+  else allPackages
