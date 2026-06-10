@@ -104,7 +104,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Open source VST3 inflator audio effect plugin";
     homepage = "https://github.com/Kiriki-liszt/JS_Inflator";
     license = lib.licenses.gpl3Only;
-    maintainers = [];
+    maintainers = with lib.maintainers; [9prestidigitator];
     platforms = lib.platforms.linux;
   };
 })

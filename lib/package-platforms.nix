@@ -3,20 +3,32 @@
   filterByPlatform ? true,
 }: let
   inherit (pkgs) lib callPackage;
-  innerPitchPackages = callPackage ../pkgs/inner-pitch.nix {};
-  innerPitch = innerPitchPackages.default.overrideAttrs (oldAttrs: {
-    passthru = (oldAttrs.passthru or {}) // innerPitchPackages;
-  });
+  withPassthru = package: passthru:
+    package.overrideAttrs (oldAttrs: {
+      passthru = (oldAttrs.passthru or {}) // passthru;
+    });
+  auburnSoundsPackages = callPackage ../pkgs/auburn-sounds.nix {};
+  auburnSounds = withPassthru auburnSoundsPackages.default auburnSoundsPackages;
+  innerPitchPackages = auburnSoundsPackages.inner-pitch;
+  innerPitch = withPassthru innerPitchPackages.default innerPitchPackages;
   pianoteqPackages = callPackage ../pkgs/pianoteq.nix {};
-  pianoteq = pianoteqPackages.default.overrideAttrs (oldAttrs: {
-    passthru = (oldAttrs.passthru or {}) // pianoteqPackages;
-  });
+  pianoteq = withPassthru pianoteqPackages.default pianoteqPackages;
   availablePackages =
     lib.filterAttrs
     (_: package: lib.meta.availableOn pkgs.stdenv.hostPlatform package)
     allPackages;
   allPackages = {
     amplocker = callPackage ../pkgs/amplocker.nix {};
+    auburn-sounds = auburnSounds;
+    auburn-sounds-couture = withPassthru auburnSoundsPackages.couture.default auburnSoundsPackages.couture;
+    auburn-sounds-free = auburnSoundsPackages.free;
+    auburn-sounds-full = auburnSoundsPackages.full;
+    auburn-sounds-graillon = withPassthru auburnSoundsPackages.graillon.default auburnSoundsPackages.graillon;
+    auburn-sounds-inner-pitch = innerPitch;
+    auburn-sounds-lens = withPassthru auburnSoundsPackages.lens.default auburnSoundsPackages.lens;
+    auburn-sounds-panagement = withPassthru auburnSoundsPackages.panagement.default auburnSoundsPackages.panagement;
+    auburn-sounds-renegate = withPassthru auburnSoundsPackages.renegate.default auburnSoundsPackages.renegate;
+    auburn-sounds-selene = withPassthru auburnSoundsPackages.selene.default auburnSoundsPackages.selene;
     bitwig6 = callPackage ../pkgs/bitwig6.nix {};
     drumlocker = callPackage ../pkgs/drumlocker.nix {};
     # eden = callPackage ../pkgs/eden.nix {};

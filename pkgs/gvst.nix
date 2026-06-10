@@ -79,7 +79,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "GVST audio effect and instrument plugin suite";
     homepage = "https://gvst.uk/";
     license = lib.licenses.unfree;
-    maintainers = [];
+    maintainers = with lib.maintainers; [9prestidigitator];
     platforms = ["x86_64-linux"];
     sourceProvenance = [lib.sourceTypes.binaryNativeCode];
   };

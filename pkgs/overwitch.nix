@@ -60,7 +60,7 @@
     description = "JACK client for Overbridge 2 devices";
     homepage = "https://dagargo.github.io/overwitch/";
     license = licenses.gpl3Only;
-    maintainers = [];
+    maintainers = with lib.maintainers; [9prestidigitator];
     platforms = platforms.linux;
     mainProgram = "overwitch";
   };
