@@ -114,7 +114,8 @@
     };
 
   version2 = "2.1";
-in {
-  free_2 = mkFree version2 "sha256-7tuzB5VOw4+HV10eGAcllkUQfYMHecNyeqkSlGVpH+w=";
-  full_2 = mkFull version2 lib.fakeHash;
+in rec {
+  free = mkFree version2 "sha256-7tuzB5VOw4+HV10eGAcllkUQfYMHecNyeqkSlGVpH+w=";
+  full = mkFull version2 lib.fakeHash;
+  default = free;
 }

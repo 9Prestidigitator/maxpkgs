@@ -58,4 +58,8 @@ in
       mkdir -p $out
       cp libonnxruntime-neuralnote.tar.gz $out/
     '';
+
+    meta = {
+      platforms = ["x86_64-linux"];
+    };
   }

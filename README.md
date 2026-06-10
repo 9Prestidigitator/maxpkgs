@@ -14,7 +14,6 @@ A collection of nix packages and modules I commonly use that aren't always avail
 - Amplocker
 - Drum Locker
 - MT Power Drumkit 2
-- Eden Emulator v0.2.0 (nixpkgs is up to date)
 
 ## Usage
 

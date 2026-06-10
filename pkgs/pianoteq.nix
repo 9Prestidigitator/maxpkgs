@@ -309,7 +309,7 @@
         inherit hash;
       };
     };
-in {
+in rec {
   standard_9 = mkStandard version9 lib.fakeHash;
   stage_9 = mkStage version9 lib.fakeHash;
   standard-trial_9 = mkStandardTrial version9 "sha256-1ofPL6F12Gv+k2rZBadOa5Iyukuji6vdww87ufdKjM8=";
@@ -329,4 +329,9 @@ in {
   stage_6 = mkStage version6 "";
   standard-trial_6 = mkStandardTrial version6 "sha256-nHTAqosOJqC0VnRw2/xVpZ6y02vvau6CgfNmgiN/AHs=";
   stage-trial_6 = mkStageTrial version6 "sha256-zrv0c/Mxt1EysR7ZvmxtksXAF5MyXTFMNj4KAdO3QnE=";
+
+  standard = standard_9;
+  stage = stage_9;
+  trial = standard-trial_9;
+  default = trial;
 }

@@ -1,34 +1,37 @@
 {pkgs}: let
   inherit (pkgs) lib callPackage;
-  availableOn = systems:
-    lib.elem pkgs.stdenv.hostPlatform.system systems;
   innerPitchPackages = callPackage ../pkgs/inner-pitch.nix {};
+  innerPitch = innerPitchPackages.default.overrideAttrs (oldAttrs: {
+    passthru = (oldAttrs.passthru or {}) // innerPitchPackages;
+  });
   pianoteqPackages = callPackage ../pkgs/pianoteq.nix {};
-in
-  {}
-  // lib.optionalAttrs (availableOn ["x86_64-linux"]) {
+  pianoteq = pianoteqPackages.default.overrideAttrs (oldAttrs: {
+    passthru = (oldAttrs.passthru or {}) // pianoteqPackages;
+  });
+  availablePackages =
+    lib.filterAttrs
+    (_: package: lib.meta.availableOn pkgs.stdenv.hostPlatform package)
+    allPackages;
+  allPackages = {
     amplocker = callPackage ../pkgs/amplocker.nix {};
     bitwig6 = callPackage ../pkgs/bitwig6.nix {};
     drumlocker = callPackage ../pkgs/drumlocker.nix {};
-    eden = callPackage ../pkgs/eden.nix {};
+    # eden = callPackage ../pkgs/eden.nix {};
     gvst = callPackage ../pkgs/gvst.nix {};
-    inner-pitch = innerPitchPackages.free_2;
-    inner-pitch-free = innerPitchPackages.free_2;
-    inner-pitch-full = innerPitchPackages.full_2;
+    inner-pitch = innerPitch;
+    inner-pitch-free = innerPitchPackages.free;
+    inner-pitch-full = innerPitchPackages.full;
     js-inflator = callPackage ../pkgs/js-inflator.nix {};
-    mt-power-drumkit-2 = callPackage ../pkgs/mt-power-drumkit-2.nix {};
-    overwitch = callPackage ../pkgs/overwitch.nix {};
-    neural-amp-modeler-lv2 = callPackage ../pkgs/neural-amp-modeler-lv2.nix {};
-    pianoteq = pianoteqPackages."standard-trial_9";
-    pianoteq-standard = pianoteqPackages.standard_9;
-    pianoteq-stage = pianoteqPackages.stage_9;
-    pianoteq-trial = pianoteqPackages."standard-trial_9";
-    rubberband = callPackage ../pkgs/rubberband.nix {};
     libonnxruntime-neuralnote = callPackage ../pkgs/neuralnote/libonnxruntime-neuralnote.nix {};
+    mt-power-drumkit-2 = callPackage ../pkgs/mt-power-drumkit-2.nix {};
+    neural-amp-modeler-lv2 = callPackage ../pkgs/neural-amp-modeler-lv2.nix {};
     neuralnote = callPackage ../pkgs/neuralnote/neuralnote.nix {};
-  }
-  // lib.optionalAttrs (availableOn ["aarch64-linux"]) {
     overwitch = callPackage ../pkgs/overwitch.nix {};
-    eden = callPackage ../pkgs/eden.nix {};
-  }
-  // lib.optionalAttrs (availableOn ["aarch64-darwin"]) {}
+    inherit pianoteq;
+    pianoteq-standard = pianoteqPackages.standard;
+    pianoteq-stage = pianoteqPackages.stage;
+    pianoteq-trial = pianoteqPackages.trial;
+    rubberband = callPackage ../pkgs/rubberband.nix {};
+  };
+in
+  availablePackages
