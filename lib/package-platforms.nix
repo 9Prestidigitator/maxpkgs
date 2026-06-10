@@ -11,6 +11,7 @@ in
     eden = callPackage ../pkgs/eden.nix {};
     gvst = callPackage ../pkgs/gvst.nix {};
     js-inflator = callPackage ../pkgs/js-inflator.nix {};
+    mt-power-drumkit-2 = callPackage ../pkgs/mt-power-drumkit-2.nix {};
     overwitch = callPackage ../pkgs/overwitch.nix {};
     neural-amp-modeler-lv2 = callPackage ../pkgs/neural-amp-modeler-lv2.nix {};
     pianoteq = pianoteqPackages."standard-trial_9";

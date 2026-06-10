@@ -12,6 +12,7 @@ A collection of nix packages and modules I commonly use that aren't always avail
 - JS_Inflator v2.0.3.2
 - rubberband
 - Amplocker
+- MT Power Drumkit 2
 - Eden Emulator v0.2.0 (nixpkgs is up to date)
 
 ## Usage

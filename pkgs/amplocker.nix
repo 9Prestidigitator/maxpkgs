@@ -2,7 +2,9 @@
   lib,
   stdenv,
   fetchurl,
+  copyDesktopItems,
   unzip,
+  makeDesktopItem,
   steam-run-free,
   alsa-lib,
   libX11,
@@ -23,7 +25,12 @@ stdenv.mkDerivation {
     sha256 = "sha256-ZONs5l1ecuoUqeWTAoWyAZzBOl9DecTs3/zvkTRP8nw=";
   };
 
-  nativeBuildInputs = [unzip patchelf coreutils];
+  nativeBuildInputs = [
+    copyDesktopItems
+    unzip
+    patchelf
+    coreutils
+  ];
   buildInputs = [
     steam-run-free
     alsa-lib
@@ -40,7 +47,23 @@ stdenv.mkDerivation {
   dontStrip = true;
   dontUnpack = true;
 
+  desktopItems = [
+    (makeDesktopItem {
+      name = "amp-locker";
+      exec = "Amp_Locker_Standalone";
+      desktopName = "Amp Locker";
+      comment = "AudioAssault Amp Locker";
+      categories = [
+        "AudioVideo"
+        "Audio"
+      ];
+      startupNotify = false;
+    })
+  ];
+
   installPhase = ''
+        runHook preInstall
+
         unzip -q "$src" -d .
         rm -rf __MACOSX
         mkdir -p $out
@@ -64,6 +87,8 @@ stdenv.mkDerivation {
     ${steam-run-free}/bin/steam-run "$out/bin/.Amp_Locker_Standalone_unwrapped" "\$@"
     EOF
         chmod +x $out/bin/Amp_Locker_Standalone
+
+        runHook postInstall
   '';
 
   preFixup = let
