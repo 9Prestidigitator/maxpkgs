@@ -2,6 +2,7 @@
   inherit (pkgs) lib callPackage;
   availableOn = systems:
     lib.elem pkgs.stdenv.hostPlatform.system systems;
+  innerPitchPackages = callPackage ../pkgs/inner-pitch.nix {};
   pianoteqPackages = callPackage ../pkgs/pianoteq.nix {};
 in
   {}
@@ -11,6 +12,9 @@ in
     drumlocker = callPackage ../pkgs/drumlocker.nix {};
     eden = callPackage ../pkgs/eden.nix {};
     gvst = callPackage ../pkgs/gvst.nix {};
+    inner-pitch = innerPitchPackages.free_2;
+    inner-pitch-free = innerPitchPackages.free_2;
+    inner-pitch-full = innerPitchPackages.full_2;
     js-inflator = callPackage ../pkgs/js-inflator.nix {};
     mt-power-drumkit-2 = callPackage ../pkgs/mt-power-drumkit-2.nix {};
     overwitch = callPackage ../pkgs/overwitch.nix {};
