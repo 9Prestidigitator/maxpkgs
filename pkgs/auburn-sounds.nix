@@ -20,6 +20,7 @@
     productName,
     version,
     freeHash,
+    fullHash ? lib.fakeHash,
   }: let
     mkEdition = {
       archiveEdition,
@@ -119,14 +120,14 @@
             Then compute its hash:
               nix hash file --type sha256 --sri /path/to/${name}
 
-            Replace the hash for ${attrName}.full in pkgs/auburn-sounds.nix, then add the file to the Nix store:
+            Replace fullHash for ${attrName} in pkgs/auburn-sounds.nix, then add the file to the Nix store:
               nix-store --add-fixed sha256 /path/to/${name}
           '';
         };
       };
   in rec {
     free = mkFree version freeHash;
-    full = mkFull version lib.fakeHash;
+    full = mkFull version fullHash;
     paid = full;
     default = free;
   };
@@ -140,6 +141,7 @@
     productName = "Selene";
     version = "1.1";
     freeHash = "sha256-n7CwJELLgfO0Gfggf7YxBambQfiEW7T1qj+KsyA2ahI=";
+    fullHash = lib.fakeHash;
   };
 
   graillon = mkAuburnPlugin {
@@ -151,6 +153,7 @@
     productName = "Graillon";
     version = "3.2";
     freeHash = "sha256-2e0lS9asidXF5nA4Pewssaz0OnLGLr8uRAHQOf9r2hg=";
+    fullHash = lib.fakeHash;
   };
 
   inner-pitch = mkAuburnPlugin {
@@ -162,6 +165,7 @@
     productName = "Inner Pitch";
     version = "2.1";
     freeHash = "sha256-7tuzB5VOw4+HV10eGAcllkUQfYMHecNyeqkSlGVpH+w=";
+    fullHash = lib.fakeHash;
   };
 
   lens = mkAuburnPlugin {
@@ -173,6 +177,7 @@
     productName = "Lens";
     version = "1.4";
     freeHash = "sha256-iF+c8O1YhObUV0VX7tZ1mYS/wkDm8x00yrLMwIVACBw=";
+    fullHash = lib.fakeHash;
   };
 
   renegate = mkAuburnPlugin {
@@ -184,6 +189,7 @@
     productName = "Renegate";
     version = "1.6";
     freeHash = "sha256-eAcfQsrW/y2Qs2y0MdF3WL51XaGlIYrBw5QD2Jk7UG8=";
+    fullHash = lib.fakeHash;
   };
 
   panagement = mkAuburnPlugin {
@@ -195,6 +201,7 @@
     productName = "Panagement";
     version = "2.8";
     freeHash = "sha256-XYz0gE2Dnel6ArvuQM3Wf6E5cYE+UGERrOqsh7ZkAHg=";
+    fullHash = lib.fakeHash;
   };
 
   couture = mkAuburnPlugin {
@@ -206,6 +213,7 @@
     productName = "Couture";
     version = "1.10";
     freeHash = "sha256-KYiVdmdtGu+z6wavzYM3dRnbYepRWsaTlvri3oxbj/M=";
+    fullHash = lib.fakeHash;
   };
 
   currentPlugins = [
@@ -230,7 +238,7 @@
         inherit description;
         homepage = "https://www.auburnsounds.com/index.html";
         license = lib.licenses.unfree;
-        maintainers = with lib.maintainers; [9prestidigitator];
+        maintainers = with lib.maintainers; [polygon];
         platforms = ["x86_64-linux"];
         sourceProvenance = [lib.sourceTypes.binaryNativeCode];
       };

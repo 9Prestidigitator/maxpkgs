@@ -11,6 +11,8 @@
   auburnSounds = withPassthru auburnSoundsPackages.default auburnSoundsPackages;
   innerPitchPackages = auburnSoundsPackages.inner-pitch;
   innerPitch = withPassthru innerPitchPackages.default innerPitchPackages;
+  minimetersPackages = callPackage ../pkgs/minimeters.nix {};
+  minimeters = withPassthru minimetersPackages.default minimetersPackages;
   pianoteqPackages = callPackage ../pkgs/pianoteq.nix {};
   pianoteq = withPassthru pianoteqPackages.default pianoteqPackages;
   availablePackages =
@@ -38,6 +40,10 @@
     inner-pitch-full = innerPitchPackages.full;
     js-inflator = callPackage ../pkgs/js-inflator.nix {};
     libonnxruntime-neuralnote = callPackage ../pkgs/neuralnote/libonnxruntime-neuralnote.nix {};
+    inherit minimeters;
+    minimeters-demo = minimetersPackages.demo;
+    minimeters-full = minimetersPackages.full;
+    mixlocker = callPackage ../pkgs/mixlocker.nix {};
     mt-power-drumkit-2 = callPackage ../pkgs/mt-power-drumkit-2.nix {};
     neural-amp-modeler-lv2 = callPackage ../pkgs/neural-amp-modeler-lv2.nix {};
     neuralnote = callPackage ../pkgs/neuralnote/neuralnote.nix {};
