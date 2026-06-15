@@ -14,6 +14,7 @@
   makeWrapper,
   p7zip,
   writeShellScript,
+  hashes ? {},
 }: let
   versionForFile = v: builtins.replaceStrings ["."] [""] v;
 
@@ -310,25 +311,25 @@
       };
     };
 in rec {
-  standard_9 = mkStandard version9 lib.fakeHash;
-  stage_9 = mkStage version9 lib.fakeHash;
-  standard-trial_9 = mkStandardTrial version9 "sha256-1ofPL6F12Gv+k2rZBadOa5Iyukuji6vdww87ufdKjM8=";
-  stage-trial_9 = mkStageTrial version9 lib.fakeHash;
+  standard_9 = mkStandard version9 (hashes.standard_9 or lib.fakeHash);
+  stage_9 = mkStage version9 (hashes.stage_9 or lib.fakeHash);
+  standard-trial_9 = mkStandardTrial version9 (hashes."standard-trial_9" or "sha256-1ofPL6F12Gv+k2rZBadOa5Iyukuji6vdww87ufdKjM8=");
+  stage-trial_9 = mkStageTrial version9 (hashes."stage-trial_9" or lib.fakeHash);
 
-  standard_8 = mkStandard version8 "sha256-ZDGB/SOOz+sWz7P+sNzyaipEH452n8zq5LleO3ztSXc=";
-  stage_8 = mkStage version8 "";
-  standard-trial_8 = mkStandardTrial version8 "sha256-K3LbAWxciXt9hVAyRayxSoE/IYJ38Fd03+j0s7ZsMuw=";
-  stage-trial_8 = mkStageTrial version8 "sha256-k0p7SnkEq90bqIlT7PTYAQuhKEDVi+srHwYrpMUtIbM=";
+  standard_8 = mkStandard version8 (hashes.standard_8 or "sha256-ZDGB/SOOz+sWz7P+sNzyaipEH452n8zq5LleO3ztSXc=");
+  stage_8 = mkStage version8 (hashes.stage_8 or "");
+  standard-trial_8 = mkStandardTrial version8 (hashes."standard-trial_8" or "sha256-K3LbAWxciXt9hVAyRayxSoE/IYJ38Fd03+j0s7ZsMuw=");
+  stage-trial_8 = mkStageTrial version8 (hashes."stage-trial_8" or "sha256-k0p7SnkEq90bqIlT7PTYAQuhKEDVi+srHwYrpMUtIbM=");
 
-  standard_7 = mkStandard version7 "sha256-TA9CiuT21fQedlMUGz7bNNxYun5ArmRjvIxjOGqXDCs=";
-  stage_7 = mkStage version7 "";
-  standard-trial_7 = mkStandardTrial version7 "sha256-3a3+SKTEhvDtqK5Kg4E6KiLvn5+j6JN6ntIb72u2bdQ=";
-  stage-trial_7 = mkStageTrial version7 "sha256-ybtq+hjnaQxpLxv2KE0ZcbQXtn5DJJsnMwCmh3rlrIc=";
+  standard_7 = mkStandard version7 (hashes.standard_7 or "sha256-TA9CiuT21fQedlMUGz7bNNxYun5ArmRjvIxjOGqXDCs=");
+  stage_7 = mkStage version7 (hashes.stage_7 or "");
+  standard-trial_7 = mkStandardTrial version7 (hashes."standard-trial_7" or "sha256-3a3+SKTEhvDtqK5Kg4E6KiLvn5+j6JN6ntIb72u2bdQ=");
+  stage-trial_7 = mkStageTrial version7 (hashes."stage-trial_7" or "sha256-ybtq+hjnaQxpLxv2KE0ZcbQXtn5DJJsnMwCmh3rlrIc=");
 
-  standard_6 = mkStandard version6 "sha256-u6ZNpmHFVOk+r+6Q8OURSfAi41cxMoDvaEXrTtHEAVY=";
-  stage_6 = mkStage version6 "";
-  standard-trial_6 = mkStandardTrial version6 "sha256-nHTAqosOJqC0VnRw2/xVpZ6y02vvau6CgfNmgiN/AHs=";
-  stage-trial_6 = mkStageTrial version6 "sha256-zrv0c/Mxt1EysR7ZvmxtksXAF5MyXTFMNj4KAdO3QnE=";
+  standard_6 = mkStandard version6 (hashes.standard_6 or "sha256-u6ZNpmHFVOk+r+6Q8OURSfAi41cxMoDvaEXrTtHEAVY=");
+  stage_6 = mkStage version6 (hashes.stage_6 or "");
+  standard-trial_6 = mkStandardTrial version6 (hashes."standard-trial_6" or "sha256-nHTAqosOJqC0VnRw2/xVpZ6y02vvau6CgfNmgiN/AHs=");
+  stage-trial_6 = mkStageTrial version6 (hashes."stage-trial_6" or "sha256-zrv0c/Mxt1EysR7ZvmxtksXAF5MyXTFMNj4KAdO3QnE=");
 
   standard = standard_9;
   stage = stage_9;

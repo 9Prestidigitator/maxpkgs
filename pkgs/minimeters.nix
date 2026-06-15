@@ -17,6 +17,7 @@
   openssl,
   unzip,
   writeShellScript,
+  paidHash ? lib.fakeHash,
 }: let
   version = "1.0.29";
   homepage = "https://minimeters.app/";
@@ -217,7 +218,7 @@
 
   paidSrc = requireFile rec {
     name = platformInfo.paidFileName;
-    hash = lib.fakeHash;
+    hash = paidHash;
     message = ''
       MiniMeters is a paid download distributed through itch.io.
 
@@ -227,7 +228,7 @@
       Then compute its hash:
         nix hash file --type sha256 --sri /path/to/${name}
 
-      Replace the hash for minimeters.full in pkgs/minimeters.nix, then add the file to the Nix store:
+      Override the paidHash package argument with that hash, then add the file to the Nix store:
         nix-store --add-fixed sha256 /path/to/${name}
     '';
   };

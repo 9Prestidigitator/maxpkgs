@@ -8,6 +8,7 @@
   symlinkJoin,
   unzip,
   zlib,
+  fullHashes ? {},
 }: let
   pluginPaths = plugins: map (plugin: plugin.default) plugins;
 
@@ -120,7 +121,7 @@
             Then compute its hash:
               nix hash file --type sha256 --sri /path/to/${name}
 
-            Replace fullHash for ${attrName} in pkgs/auburn-sounds.nix, then add the file to the Nix store:
+            Override fullHashes."${attrName}" with that hash, then add the file to the Nix store:
               nix-store --add-fixed sha256 /path/to/${name}
           '';
         };
@@ -141,7 +142,7 @@
     productName = "Selene";
     version = "1.1";
     freeHash = "sha256-n7CwJELLgfO0Gfggf7YxBambQfiEW7T1qj+KsyA2ahI=";
-    fullHash = lib.fakeHash;
+    fullHash = fullHashes.selene or lib.fakeHash;
   };
 
   graillon = mkAuburnPlugin {
@@ -153,7 +154,7 @@
     productName = "Graillon";
     version = "3.2";
     freeHash = "sha256-2e0lS9asidXF5nA4Pewssaz0OnLGLr8uRAHQOf9r2hg=";
-    fullHash = lib.fakeHash;
+    fullHash = fullHashes.graillon or lib.fakeHash;
   };
 
   inner-pitch = mkAuburnPlugin {
@@ -165,7 +166,7 @@
     productName = "Inner Pitch";
     version = "2.1";
     freeHash = "sha256-7tuzB5VOw4+HV10eGAcllkUQfYMHecNyeqkSlGVpH+w=";
-    fullHash = lib.fakeHash;
+    fullHash = fullHashes."inner-pitch" or lib.fakeHash;
   };
 
   lens = mkAuburnPlugin {
@@ -177,7 +178,7 @@
     productName = "Lens";
     version = "1.4";
     freeHash = "sha256-iF+c8O1YhObUV0VX7tZ1mYS/wkDm8x00yrLMwIVACBw=";
-    fullHash = lib.fakeHash;
+    fullHash = fullHashes.lens or lib.fakeHash;
   };
 
   renegate = mkAuburnPlugin {
@@ -189,7 +190,7 @@
     productName = "Renegate";
     version = "1.6";
     freeHash = "sha256-eAcfQsrW/y2Qs2y0MdF3WL51XaGlIYrBw5QD2Jk7UG8=";
-    fullHash = lib.fakeHash;
+    fullHash = fullHashes.renegate or lib.fakeHash;
   };
 
   panagement = mkAuburnPlugin {
@@ -201,7 +202,7 @@
     productName = "Panagement";
     version = "2.8";
     freeHash = "sha256-XYz0gE2Dnel6ArvuQM3Wf6E5cYE+UGERrOqsh7ZkAHg=";
-    fullHash = lib.fakeHash;
+    fullHash = fullHashes.panagement or lib.fakeHash;
   };
 
   couture = mkAuburnPlugin {
@@ -213,7 +214,7 @@
     productName = "Couture";
     version = "1.10";
     freeHash = "sha256-KYiVdmdtGu+z6wavzYM3dRnbYepRWsaTlvri3oxbj/M=";
-    fullHash = lib.fakeHash;
+    fullHash = fullHashes.couture or lib.fakeHash;
   };
 
   currentPlugins = [
