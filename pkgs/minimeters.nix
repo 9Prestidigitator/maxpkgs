@@ -8,14 +8,18 @@
   copyDesktopItems,
   curl,
   jq,
+  libdecor,
+  libglvnd,
   libX11,
   libXcursor,
   libXrandr,
   libXrender,
   libxkbcommon,
+  makeWrapper,
   makeDesktopItem,
   openssl,
   unzip,
+  wayland,
   writeShellScript,
   paidHash ? lib.fakeHash,
 }: let
@@ -53,6 +57,8 @@
   ];
 
   runtimeLibraries = [
+    libdecor
+    libglvnd
     libX11
     libXcursor
     libXrandr
@@ -60,6 +66,7 @@
     libxkbcommon
     openssl
     stdenv.cc.cc.lib
+    wayland
   ];
 
   fetchItchUpload = {
@@ -142,6 +149,7 @@
       nativeBuildInputs = [
         autoPatchelfHook
         copyDesktopItems
+        makeWrapper
         unzip
       ];
 
@@ -184,6 +192,9 @@
 
         install -Dm755 squashfs-root/usr/bin/MiniMeters "$out/bin/${binaryName}"
         install -Dm644 squashfs-root/MiniMeters.png "$out/share/icons/hicolor/256x256/apps/minimeters.png"
+
+        wrapProgram "$out/bin/${binaryName}" \
+          --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath runtimeLibraries}"
 
         if [ -d CLAP ]; then
           while IFS= read -r -d "" plugin; do

@@ -6,28 +6,46 @@ This repo is Linux-audio heavy. Several packages are proprietary or otherwise un
 
 ## What is included
 
-| Attribute                                                                                                                                                                          | Upstream                                                                           | Installs                      | Notes                                                                                           |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------- |
-| `bitwig6`                                                                                                                                                                          | [Bitwig Studio](https://www.bitwig.com/)                                           | DAW                           | Linux `.deb` repackaged for Nix.                                                                |
-| `overwitch`                                                                                                                                                                        | [Overwitch](https://dagargo.github.io/overwitch/)                                  | JACK client and helper tools  | Includes `nixosModules.overwitch`.                                                              |
-| `pianoteq`, `pianoteq-trial`                                                                                                                                                       | [Modartt Pianoteq](https://www.modartt.com/pianoteq)                               | Standalone, LV2, VST3         | Defaults to the Standard trial.                                                                 |
-| `pianoteq-standard`, `pianoteq-stage`                                                                                                                                              | [Modartt Pianoteq](https://www.modartt.com/pianoteq)                               | Standalone, LV2, VST3         | Paid downloads. See [Paid Packages](#paid-packages).                                            |
-| `minimeters`, `minimeters-demo`                                                                                                                                                    | [MiniMeters](https://minimeters.app/)                                              | Standalone, CLAP, VST3        | Defaults to the free demo.                                                                      |
-| `minimeters-full`                                                                                                                                                                  | [MiniMeters](https://minimeters.app/)                                              | Standalone, CLAP, VST3        | Paid itch.io archive. See [Paid Packages](#paid-packages).                                      |
-| `auburn-sounds`, `auburn-sounds-free`                                                                                                                                              | [Auburn Sounds](https://www.auburnsounds.com/)                                     | CLAP, LV2, VST2, VST3         | Free editions of the current suite.                                                             |
-| `auburn-sounds-full`                                                                                                                                                               | [Auburn Sounds](https://www.auburnsounds.com/)                                     | CLAP, LV2, VST2, VST3         | Paid full editions. See [Paid Packages](#paid-packages).                                        |
-| `auburn-sounds-selene`, `auburn-sounds-graillon`, `auburn-sounds-inner-pitch`, `auburn-sounds-lens`, `auburn-sounds-panagement`, `auburn-sounds-renegate`, `auburn-sounds-couture` | [Auburn Sounds](https://www.auburnsounds.com/)                                     | CLAP, LV2, VST2, VST3         | Individual free editions. Each also exposes `.full` and `.paid` passthru attrs.                 |
-| `inner-pitch`, `inner-pitch-free`, `inner-pitch-full`                                                                                                                              | [Auburn Sounds Inner Pitch](https://www.auburnsounds.com/products/InnerPitch.html) | CLAP, LV2, VST2, VST3         | Convenience aliases for the Auburn Sounds package.                                              |
-| `gvst`                                                                                                                                                                             | [GVST](https://gvst.uk/)                                                           | VST2                          | GVST Linux plugin suite.                                                                        |
-| `amplocker`                                                                                                                                                                        | [AudioAssault](https://audioassault.mx/)                                           | Standalone, LV2, VST3         | Free Amp Locker package.                                                                        |
-| `drumlocker`                                                                                                                                                                       | [AudioAssault Drum Locker](https://audioassault.mx/getdrumlocker)                  | LV2, VST3, sample data helper | Run `drum-locker-install-data` if the plugin needs writable sample data in your home directory. |
-| `mixlocker`                                                                                                                                                                        | [AudioAssault Mix Locker](https://audioassault.mx/getmixlocker)                    | LV2, VST3, preset/data helper | Run `mix-locker-install-data` if the plugin needs writable data in your home directory.         |
-| `mt-power-drumkit-2`                                                                                                                                                               | [MT Power Drum Kit 2](https://www.powerdrumkit.com/)                               | VST3                          | Free drum sampler plugin.                                                                       |
-| `neuralnote`                                                                                                                                                                       | [NeuralNote](https://github.com/DamRsn/NeuralNote)                                 | Standalone, VST3              | Automatic transcription tool.                                                                   |
-| `neural-amp-modeler-lv2`                                                                                                                                                           | [NAM LV2](https://github.com/mikeoliphant/neural-amp-modeler-lv2)                  | LV2                           | Neural Amp Modeler LV2 implementation.                                                          |
-| `js-inflator`                                                                                                                                                                      | [JS_Inflator](https://github.com/Kiriki-liszt/JS_Inflator)                         | VST3                          | Open source inflator effect.                                                                    |
-| `rubberband`                                                                                                                                                                       | [Rubber Band Library](https://breakfastquay.com/rubberband/)                       | Library and audio plugins     | Exposed as `rubberband-lv2` from the overlay to avoid clashing with nixpkgs.                    |
-| `libonnxruntime-neuralnote`                                                                                                                                                        | [ONNX Runtime](https://onnxruntime.ai/)                                            | Support library               | Usually not installed directly.                                                                 |
+### Apps and Tools
+
+| Attribute | Upstream | Installs | Notes |
+| --------- | -------- | -------- | ----- |
+| `bitwig6` | [Bitwig Studio](https://www.bitwig.com/) | DAW | Linux `.deb` repackaged for Nix. |
+| `overwitch` | [Overwitch](https://dagargo.github.io/overwitch/) | JACK client and helper tools | Includes `nixosModules.overwitch`. |
+| `pianoteq`, `pianoteq-trial` | [Modartt Pianoteq](https://www.modartt.com/pianoteq) | Standalone, LV2, VST3 | Defaults to the Standard trial. |
+| `pianoteq-standard`, `pianoteq-stage` | [Modartt Pianoteq](https://www.modartt.com/pianoteq) | Standalone, LV2, VST3 | Paid downloads. See [Paid Packages](#paid-packages). |
+| `minimeters`, `minimeters-demo` | [MiniMeters](https://minimeters.app/) | Standalone, CLAP, VST3 | Defaults to the free demo. |
+| `minimeters-full` | [MiniMeters](https://minimeters.app/) | Standalone, CLAP, VST3 | Paid itch.io archive. See [Paid Packages](#paid-packages). |
+| `pulse-visualizer` | [Pulse Visualizer](https://github.com/Audio-Solutions/pulse-visualizer) | Standalone visualizer | Uses the upstream flake package. |
+| `neuralnote` | [NeuralNote](https://github.com/DamRsn/NeuralNote) | Standalone, VST3 | Automatic transcription tool. |
+| `melissa` | [Melissa](https://github.com/mosynthkey/Melissa) | Standalone practice player with stem separation | Built from upstream master for merged Linux support; uses packaged `spleeterpp`, TensorFlow C, and ONNX Runtime for stem separation. |
+
+### Audio Plugins
+
+| Attribute | Upstream | Installs | Notes |
+| --------- | -------- | -------- | ----- |
+| `auburn-sounds`, `auburn-sounds-free` | [Auburn Sounds](https://www.auburnsounds.com/) | CLAP, LV2, VST2, VST3 | Free editions of the current suite. |
+| `auburn-sounds-full` | [Auburn Sounds](https://www.auburnsounds.com/) | CLAP, LV2, VST2, VST3 | Paid full editions. See [Paid Packages](#paid-packages). |
+| `auburn-sounds-selene`, `auburn-sounds-graillon`, `auburn-sounds-inner-pitch`, `auburn-sounds-lens`, `auburn-sounds-panagement`, `auburn-sounds-renegate`, `auburn-sounds-couture` | [Auburn Sounds](https://www.auburnsounds.com/) | CLAP, LV2, VST2, VST3 | Individual free editions. Each also exposes `.full` and `.paid` passthru attrs. |
+| `inner-pitch`, `inner-pitch-free`, `inner-pitch-full` | [Auburn Sounds Inner Pitch](https://www.auburnsounds.com/products/InnerPitch.html) | CLAP, LV2, VST2, VST3 | Convenience aliases for the Auburn Sounds package. |
+| `gvst` | [GVST](https://gvst.uk/) | VST2 | GVST Linux plugin suite. |
+| `amplocker` | [AudioAssault](https://audioassault.mx/) | Standalone, LV2, VST3 | Free Amp Locker package. |
+| `drumlocker` | [AudioAssault Drum Locker](https://audioassault.mx/getdrumlocker) | LV2, VST3, sample data helper | Run `drum-locker-install-data` if the plugin needs writable sample data in your home directory. |
+| `mixlocker` | [AudioAssault Mix Locker](https://audioassault.mx/getmixlocker) | LV2, VST3, preset/data helper | Run `mix-locker-install-data` if the plugin needs writable data in your home directory. |
+| `mt-power-drumkit-2` | [MT Power Drum Kit 2](https://www.powerdrumkit.com/) | VST3 | Free drum sampler plugin. |
+| `chow-tape-model` | [CHOW Tape Model](https://github.com/jatinchowdhury18/AnalogTapeModel) | Standalone, CLAP, LV2, VST3 | Patched for the vendored JUCE `std::exchange` build failure. |
+| `wolf-shaper` | [Wolf Shaper](https://github.com/wolf-plugins/wolf-shaper) | Standalone, DSSI, LV2, VST2 | Spline-based waveshaper plugin. |
+| `spice-oss` | [Spice OSS](https://github.com/DatanoiseTV/spice-oss) | Standalone, LV2, VST3 | Analog saturation and cabinet simulation plugin. |
+| `neural-amp-modeler-lv2` | [NAM LV2](https://github.com/mikeoliphant/neural-amp-modeler-lv2) | LV2 | Neural Amp Modeler LV2 implementation. |
+| `js-inflator` | [JS_Inflator](https://github.com/Kiriki-liszt/JS_Inflator) | VST3 | Open source inflator effect. |
+| `rubberband` | [Rubber Band Library](https://breakfastquay.com/rubberband/) | Library and audio plugins | Exposed as `rubberband-lv2` from the overlay to avoid clashing with nixpkgs. |
+
+### Support Libraries
+
+| Attribute | Upstream | Notes |
+| --------- | -------- | ----- |
+| `libonnxruntime-neuralnote` | [ONNX Runtime](https://onnxruntime.ai/) | Usually not installed directly. |
+| `spleeterpp` | [spleeterpp](https://github.com/gvne/spleeterpp) | C++ Spleeter inference library used by `melissa`. |
 
 ## Quick Start
 

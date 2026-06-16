@@ -1,6 +1,7 @@
-{
+{inputs, ...}: {
   flake.overlays.default = final: prev: let
     packages = import ../lib/package-platforms.nix {
+      inherit inputs;
       pkgs = final;
       filterByPlatform = false;
     };

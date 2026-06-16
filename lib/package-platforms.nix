@@ -1,5 +1,6 @@
 {
   pkgs,
+  inputs,
   filterByPlatform ? true,
 }: let
   inherit (pkgs) lib callPackage;
@@ -15,6 +16,7 @@
   minimeters = withPassthru minimetersPackages.default minimetersPackages;
   pianoteqPackages = callPackage ../pkgs/pianoteq.nix {};
   pianoteq = withPassthru pianoteqPackages.default pianoteqPackages;
+  spleeterpp = callPackage ../pkgs/spleeterpp.nix {};
   availablePackages =
     lib.filterAttrs
     (_: package: lib.meta.availableOn pkgs.stdenv.hostPlatform package)
@@ -32,8 +34,8 @@
     auburn-sounds-renegate = withPassthru auburnSoundsPackages.renegate.default auburnSoundsPackages.renegate;
     auburn-sounds-selene = withPassthru auburnSoundsPackages.selene.default auburnSoundsPackages.selene;
     bitwig6 = callPackage ../pkgs/bitwig6.nix {};
+    chow-tape-model = callPackage ../pkgs/chow-tape-model.nix {};
     drumlocker = callPackage ../pkgs/drumlocker.nix {};
-    # eden = callPackage ../pkgs/eden.nix {};
     gvst = callPackage ../pkgs/gvst.nix {};
     inner-pitch = innerPitch;
     inner-pitch-free = innerPitchPackages.free;
@@ -43,6 +45,7 @@
     inherit minimeters;
     minimeters-demo = minimetersPackages.demo;
     minimeters-full = minimetersPackages.full;
+    melissa = callPackage ../pkgs/melissa.nix {inherit spleeterpp;};
     mixlocker = callPackage ../pkgs/mixlocker.nix {};
     mt-power-drumkit-2 = callPackage ../pkgs/mt-power-drumkit-2.nix {};
     neural-amp-modeler-lv2 = callPackage ../pkgs/neural-amp-modeler-lv2.nix {};
@@ -52,7 +55,10 @@
     pianoteq-standard = pianoteqPackages.standard;
     pianoteq-stage = pianoteqPackages.stage;
     pianoteq-trial = pianoteqPackages.trial;
+    pulse-visualizer = inputs.pulse-visualizer.packages.${pkgs.stdenv.hostPlatform.system}.default;
     rubberband = callPackage ../pkgs/rubberband.nix {};
+    spice-oss = callPackage ../pkgs/spice-oss.nix {};
+    inherit spleeterpp;
   };
 in
   if filterByPlatform

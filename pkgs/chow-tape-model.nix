@@ -1,0 +1,134 @@
+{
+  alsa-lib,
+  at-spi2-core,
+  cmake,
+  curl,
+  dbus,
+  libepoxy,
+  fetchFromGitHub,
+  libglut,
+  freetype,
+  gtk3,
+  lib,
+  libGL,
+  libxcursor,
+  libxdmcp,
+  libxext,
+  libxinerama,
+  libxrandr,
+  libxtst,
+  libdatrie,
+  libjack2,
+  libpsl,
+  libselinux,
+  libsepol,
+  libsysprof-capture,
+  libthai,
+  libuuid,
+  libxkbcommon,
+  lv2,
+  pcre,
+  pcre2,
+  pkg-config,
+  python3,
+  sqlite,
+  stdenv,
+}:
+stdenv.mkDerivation (finalAttrs: {
+  pname = "chow-tape-model";
+  version = "2.11.4";
+
+  src = fetchFromGitHub {
+    owner = "jatinchowdhury18";
+    repo = "AnalogTapeModel";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-WriHi68Y6hAsrwE+74JtVlAKUR9lfTczj6UK9h2FOGM=";
+    fetchSubmodules = true;
+  };
+
+  nativeBuildInputs = [
+    pkg-config
+    cmake
+  ];
+
+  buildInputs = [
+    alsa-lib
+    at-spi2-core
+    curl
+    dbus
+    libepoxy
+    libglut
+    freetype
+    gtk3
+    libGL
+    libxcursor
+    libxdmcp
+    libxext
+    libxinerama
+    libxrandr
+    libxtst
+    libdatrie
+    libjack2
+    libpsl
+    libselinux
+    libsepol
+    libsysprof-capture
+    libthai
+    libuuid
+    libxkbcommon
+    lv2
+    pcre
+    pcre2
+    python3
+    sqlite
+  ];
+
+  cmakeFlags = [
+    "-DCMAKE_AR=${stdenv.cc.cc}/bin/gcc-ar"
+    "-DCMAKE_RANLIB=${stdenv.cc.cc}/bin/gcc-ranlib"
+    "-DCMAKE_NM=${stdenv.cc.cc}/bin/gcc-nm"
+  ];
+
+  cmakeBuildType = "Release";
+
+  postPatch = ''
+    sed -i '/namespace juce/i #include <utility>' Plugin/modules/JUCE/modules/juce_gui_basics/windows/juce_ComponentPeer.h
+
+    cd Plugin
+    substituteInPlace modules/RTNeural/CMakeLists.txt --replace-fail \
+      'cmake_minimum_required(VERSION 3.1)' \
+      'cmake_minimum_required(VERSION 4.0)'
+  '';
+
+  installPhase = ''
+    runHook preInstall
+
+    mkdir -p $out/lib/lv2 $out/lib/vst3 $out/lib/clap $out/bin $out/share/doc/CHOWTapeModel
+    cd CHOWTapeModel_artefacts/${finalAttrs.cmakeBuildType}
+    cp -r LV2/CHOWTapeModel.lv2 $out/lib/lv2
+    cp -r VST3/CHOWTapeModel.vst3 $out/lib/vst3
+    cp -r CLAP/CHOWTapeModel.clap $out/lib/clap
+    cp Standalone/CHOWTapeModel $out/bin
+    cp ../../../../Manual/ChowTapeManual.pdf $out/share/doc/CHOWTapeModel/
+
+    runHook postInstall
+  '';
+
+  env.NIX_LDFLAGS = toString [
+    "-lX11"
+    "-lXext"
+    "-lXcursor"
+    "-lXinerama"
+    "-lXrandr"
+  ];
+
+  meta = {
+    homepage = "https://github.com/jatinchowdhury18/AnalogTapeModel";
+    description = "Physical modelling signal processing for analog tape recording";
+    license = with lib.licenses; [gpl3Only];
+    maintainers = with lib.maintainers; [magnetophon];
+    platforms = lib.platforms.linux;
+    broken = stdenv.hostPlatform.isAarch64;
+    mainProgram = "CHOWTapeModel";
+  };
+})

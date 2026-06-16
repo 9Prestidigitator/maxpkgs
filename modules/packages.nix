@@ -5,7 +5,7 @@
       config.allowUnfree = true;
     };
   in {
-    packages = import ../lib/package-platforms.nix {inherit pkgs;};
+    packages = import ../lib/package-platforms.nix {inherit inputs pkgs;};
 
     formatter = pkgs.alejandra;
   };
