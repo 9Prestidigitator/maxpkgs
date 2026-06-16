@@ -127,8 +127,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Physical modelling signal processing for analog tape recording";
     license = with lib.licenses; [gpl3Only];
     maintainers = with lib.maintainers; [magnetophon];
-    platforms = lib.platforms.linux;
-    broken = stdenv.hostPlatform.isAarch64;
+    platforms = ["x86_64-linux"];
     mainProgram = "CHOWTapeModel";
   };
 })

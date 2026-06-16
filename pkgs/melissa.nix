@@ -121,7 +121,7 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     license = lib.licenses.lgpl21Only;
     maintainers = [lib.maintainers."9prestidigitator"];
-    platforms = lib.platforms.linux;
+    platforms = ["x86_64-linux"];
     mainProgram = "Melissa";
   };
 })
