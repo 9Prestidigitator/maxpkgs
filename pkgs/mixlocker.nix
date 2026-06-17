@@ -51,9 +51,14 @@ stdenv.mkDerivation {
 
     cat > $out/bin/mix-locker-install-data <<EOF
     #!/usr/bin/env sh
-    data_home="\$HOME/Audio Assault/PluginData/AudioAssault/MixLockerData"
+    data_home="\$HOME/Audio Assault/PluginData/Audio Assault/MixLockerData"
+    legacy_data_home="\$HOME/Audio Assault/PluginData/AudioAssault/MixLockerData"
     mkdir -p "\$data_home"
     ${coreutils}/bin/cp -rsf --no-preserve=mode "$out/Audio Assault/MixLockerData"/. "\$data_home"/
+    mkdir -p "\$(dirname "\$legacy_data_home")"
+    if [ ! -e "\$legacy_data_home" ] || [ -L "\$legacy_data_home" ]; then
+      ${coreutils}/bin/ln -sfn "\$data_home" "\$legacy_data_home"
+    fi
     EOF
     chmod +x $out/bin/mix-locker-install-data
 

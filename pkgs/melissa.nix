@@ -1,6 +1,7 @@
 {
   alsa-lib,
   cmake,
+  copyDesktopItems,
   curl,
   fontconfig,
   freetype,
@@ -15,6 +16,7 @@
   libXinerama,
   libXrandr,
   libxkbcommon,
+  makeDesktopItem,
   onnxruntime,
   pkg-config,
   spleeterpp,
@@ -35,6 +37,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cmake
+    copyDesktopItems
     pkg-config
   ];
 
@@ -84,6 +87,21 @@ stdenv.mkDerivation (finalAttrs: {
     "-DCMAKE_BUILD_TYPE=Release"
   ];
 
+  desktopItems = [
+    (makeDesktopItem {
+      name = "melissa";
+      exec = "Melissa";
+      desktopName = "Melissa";
+      icon = "melissa";
+      comment = finalAttrs.meta.description;
+      categories = [
+        "AudioVideo"
+        "Audio"
+      ];
+      startupNotify = false;
+    })
+  ];
+
   preConfigure = ''
     export NIX_CFLAGS_COMPILE="$NIX_CFLAGS_COMPILE $(pkg-config --cflags gtk+-3.0 webkit2gtk-4.1)"
   '';
@@ -92,6 +110,7 @@ stdenv.mkDerivation (finalAttrs: {
     runHook preInstall
 
     install -Dm755 Melissa_artefacts/Release/Melissa $out/bin/Melissa
+    install -Dm644 ../Resource/icon.png $out/share/icons/hicolor/1024x1024/apps/melissa.png
 
     runHook postInstall
   '';

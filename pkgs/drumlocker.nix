@@ -41,6 +41,7 @@ stdenv.mkDerivation {
 
     unzip -q "$src" -d .
     rm -rf __MACOSX
+    find DrumLockerData "Drum Locker.vst3" -name ".DS_Store" -delete
 
     mkdir -p $out/bin $out/lib/lv2 $out/lib/vst3 $out/"Audio Assault" $out/share/doc/$pname
     cp -r "Drum Locker.lv2" $out/lib/lv2/
@@ -79,7 +80,7 @@ stdenv.mkDerivation {
     description = "AudioAssault Drum Locker drum sample library player plugin";
     homepage = "https://audioassault.mx/getdrumlocker";
     platforms = ["x86_64-linux"];
-    maintainers = with maintainers; [9prestidigitator];
+    maintainers = [];
     license = licenses.unfree;
     sourceProvenance = [sourceTypes.binaryNativeCode];
   };

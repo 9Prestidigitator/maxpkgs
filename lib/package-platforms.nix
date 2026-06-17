@@ -59,6 +59,7 @@
       pianoteq-trial = pianoteqPackages.trial;
       rubberband = callPackage ../pkgs/rubberband.nix {};
       spice-oss = callPackage ../pkgs/spice-oss.nix {};
+      ultimate-vocal-remover-gui = callPackage ../pkgs/ultimate-vocal-remover-gui.nix {};
       inherit spleeterpp;
     }
     // lib.optionalAttrs (lib.hasAttr system inputs.pulse-visualizer.packages) {
