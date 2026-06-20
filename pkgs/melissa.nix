@@ -110,6 +110,7 @@ stdenv.mkDerivation (finalAttrs: {
     runHook preInstall
 
     install -Dm755 Melissa_artefacts/Release/Melissa $out/bin/Melissa
+    install -Dm644 ../Resource/icon.png $out/share/icons/hicolor/512x512/apps/melissa.png
     install -Dm644 ../Resource/icon.png $out/share/icons/hicolor/1024x1024/apps/melissa.png
 
     runHook postInstall
