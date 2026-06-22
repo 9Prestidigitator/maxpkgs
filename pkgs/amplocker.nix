@@ -22,7 +22,7 @@ stdenv.mkDerivation {
 
   src = fetchurl {
     url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerLinux.zip";
-    sha256 = "sha256-ZONs5l1ecuoUqeWTAoWyAZzBOl9DecTs3/zvkTRP8nw=";
+    sha256 = "sha256-15FdAm//KPC7NdSryhW6vfhBiHlmSaaGnKFs+Nbvbqg=";
   };
 
   nativeBuildInputs = [
