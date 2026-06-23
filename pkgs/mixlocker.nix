@@ -15,7 +15,7 @@ stdenv.mkDerivation {
 
   src = fetchurl {
     url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/MixLockerLinux.zip";
-    hash = "sha256-am6DlHEr39XMsEtxNM68X8Ht/AtN1CkoYX4vcJym/A0=";
+    hash = "sha256-oao+wSmiF2vjbw9N8WFGr/c2NwGfUkTsa+4MhGiyYsk=";
   };
 
   nativeBuildInputs = [
