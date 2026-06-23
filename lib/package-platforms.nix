@@ -39,6 +39,7 @@
       chow-tape-model = callPackage ../pkgs/chow-tape-model.nix {};
       drumlocker = callPackage ../pkgs/drumlocker.nix {};
       gvst = callPackage ../pkgs/gvst.nix {};
+      ildaeil = callPackage ../pkgs/ildaeil.nix {};
       inner-pitch = innerPitch;
       inner-pitch-free = innerPitchPackages.free;
       inner-pitch-full = innerPitchPackages.full;
