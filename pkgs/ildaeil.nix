@@ -10,24 +10,22 @@
   libXrandr,
   liblo,
   libjack2,
-  makeWrapper,
   pkg-config,
   stdenv,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "ildaeil";
-  version = "1.3";
+  version = "unstable-2026-06-23";
 
   src = fetchFromGitHub {
     owner = "DISTRHO";
     repo = "Ildaeil";
-    tag = "v${finalAttrs.version}";
+    rev = "af9fc9f73b1a1832da8d6dfa12f7d03c431293d6";
     fetchSubmodules = true;
-    hash = "sha256-Jm886EWWv0/BOC2f0S+U7wurpaBunThcUk3YdPa+k/4=";
+    hash = "sha256-7oayKRqAHXEkf3PMsma3HfuHYXrNNR+xkrHyYrZ7s5I=";
   };
 
   nativeBuildInputs = [
-    makeWrapper
     pkg-config
   ];
 
@@ -49,6 +47,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   postPatch = ''
     patchShebangs dpf/utils
+
+    substituteInPlace plugins/Common/IldaeilPlugin.cpp \
+      --replace-fail \
+        'path = getHomePath() + "/.lv2:/usr/lib/lv2:/usr/local/lib/lv2";' \
+        'path = getHomePath() + "/.lv2:/run/current-system/sw/lib/lv2:/usr/lib/lv2:/usr/local/lib/lv2";'
   '';
 
   postInstall = ''
