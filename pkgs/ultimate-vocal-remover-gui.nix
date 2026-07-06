@@ -193,7 +193,6 @@ in
       description = "GUI for vocal removal and source separation using deep neural networks";
       homepage = "https://github.com/Anjok07/ultimatevocalremovergui";
       license = lib.licenses.mit;
-      maintainers = [];
       mainProgram = "ultimate-vocal-remover-gui";
       platforms = ["x86_64-linux"];
     };

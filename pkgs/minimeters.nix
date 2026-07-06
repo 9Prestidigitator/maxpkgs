@@ -215,7 +215,6 @@
       meta = {
         inherit description homepage platforms;
         license = lib.licenses.unfree;
-        maintainers = with lib.maintainers; [polygon];
         mainProgram = binaryName;
         sourceProvenance = [lib.sourceTypes.binaryNativeCode];
       };

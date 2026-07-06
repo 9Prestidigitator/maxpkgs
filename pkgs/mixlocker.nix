@@ -85,7 +85,7 @@ stdenv.mkDerivation {
     description = "AudioAssault Mix Locker mixing suite plugin";
     homepage = "https://audioassault.mx/getmixlocker";
     platforms = ["x86_64-linux"];
-    maintainers = with maintainers; [polygon];
+    maintainers = with maintainers; [9prestidigitator];
     license = licenses.unfree;
     sourceProvenance = [sourceTypes.binaryNativeCode];
   };

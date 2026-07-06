@@ -6,7 +6,7 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "neural-amp-modeler-lv2";
-  version = "v0.2.0";
+  version = "v0.2.1";
 
   src = fetchFromGitHub {
     owner = "mikeoliphant";
@@ -15,12 +15,10 @@ stdenv.mkDerivation (finalAttrs: {
     deepClone = true;
     fetchSubmodules = true;
     postFetch = "rm -rf $out/.git";
-    hash = "sha256-ZKpZBjZNVx8E8O1MfZ0QJDzxI2l9EDkn/59i8+l5sUg=";
+    hash = "sha256-tTvp22Pqr9Be96Xw+14GDTs0rUCL65nFl8o/yyeRHsQ=";
   };
 
-  nativeBuildInputs = [
-    cmake
-  ];
+  nativeBuildInputs = [cmake];
 
   meta = {
     maintainers = [lib.maintainers.viraptor];

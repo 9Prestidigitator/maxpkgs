@@ -102,7 +102,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "C++ inference library for Spleeter source separation";
     homepage = "https://github.com/gvne/spleeterpp";
     license = lib.licenses.mit;
-    maintainers = [lib.maintainers."9prestidigitator"];
     platforms = ["x86_64-linux"];
   };
 })

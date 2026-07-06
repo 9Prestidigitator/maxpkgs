@@ -25,6 +25,7 @@
   allPackages =
     {
       amplocker = callPackage ../pkgs/amplocker.nix {};
+      audiogridder = callPackage ../pkgs/audiogridder.nix {};
       auburn-sounds = auburnSounds;
       auburn-sounds-couture = withPassthru auburnSoundsPackages.couture.default auburnSoundsPackages.couture;
       auburn-sounds-free = auburnSoundsPackages.free;

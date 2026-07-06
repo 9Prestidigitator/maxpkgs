@@ -64,7 +64,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Mini plugin host as a plugin";
     homepage = "https://github.com/DISTRHO/Ildaeil";
     license = lib.licenses.gpl2Only;
-    maintainers = with lib.maintainers; [magnetophon];
     platforms = lib.platforms.linux;
   };
 })

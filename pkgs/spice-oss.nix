@@ -84,7 +84,6 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Analog modeling saturation plugin with cabinet simulation";
     homepage = "https://github.com/DatanoiseTV/spice-oss";
     license = lib.licenses.bsd3;
-    maintainers = [lib.maintainers."9prestidigitator"];
     platforms = lib.platforms.linux;
     mainProgram = "spice-oss";
   };

@@ -239,7 +239,6 @@
         inherit description;
         homepage = "https://www.auburnsounds.com/index.html";
         license = lib.licenses.unfree;
-        maintainers = with lib.maintainers; [polygon];
         platforms = ["x86_64-linux"];
         sourceProvenance = [lib.sourceTypes.binaryNativeCode];
       };

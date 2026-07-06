@@ -80,7 +80,6 @@ stdenv.mkDerivation {
     description = "AudioAssault Drum Locker drum sample library player plugin";
     homepage = "https://audioassault.mx/getdrumlocker";
     platforms = ["x86_64-linux"];
-    maintainers = [];
     license = licenses.unfree;
     sourceProvenance = [sourceTypes.binaryNativeCode];
   };
