@@ -36,16 +36,16 @@
   zlib,
 }:
 stdenv.mkDerivation (finalAttrs: let
-  bitwigVersion = "6.1 Beta 1";
+  bitwigVersion = "6.1 Beta 4";
   urlVersion = lib.replaceStrings [" "] ["%20"] bitwigVersion;
 in {
   pname = "bitwig-studio6";
-  version = "6.1-beta1";
+  version = "6.1-beta4";
 
   src = fetchurl {
     name = "bitwig-studio-${finalAttrs.version}.deb";
     url = "https://www.bitwig.com/dl/Bitwig%20Studio/${urlVersion}/installer_linux/";
-    hash = "sha256-PYc7Q63ELbGLVrzRn0tzzZRrebLkizn/TteC5dfd3FY=";
+    hash = "sha256-fQ/w1jqZE+SJbtyH+KeHh859gidUdyhywkYZ+fzJmWI=";
   };
 
   strictDeps = true;
