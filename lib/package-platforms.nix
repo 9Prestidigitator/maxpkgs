@@ -21,6 +21,24 @@
   pianoteq = withPassthru pianoteqPackages.default pianoteqPackages;
   spleeterpp = callPackage ../pkgs/spleeterpp.nix {};
 
+  wineStagingPatched = (pkgs.wineWow64Packages.base.override {wineRelease = "staging";}).overrideAttrs (old: {
+    patches =
+      (old.patches or [])
+      ++ [
+        (pkgs.fetchurl {
+          url = "https://gitlab.winehq.org/-/project/5/uploads/dea8a1e711846f7e7642c16eacd284b4/bug51357.patch";
+          hash = "sha256-ZfW94gCDLGauKEZOid7ndQsaPA6SVGk22CQ3EBWAPm8=";
+        })
+      ];
+  });
+  wineSetPatched = pkgs.wineWow64Packages // {yabridge = wineStagingPatched;};
+
+  yabridgePatched = pkgs.yabridge.override {wineWow64Packages = wineSetPatched;};
+  yabridgectlPatched = pkgs.yabridgectl.override {
+    wineWow64Packages = wineSetPatched;
+    yabridge = yabridgePatched;
+  };
+
   availablePackages =
     lib.filterAttrs
     (_: package: lib.meta.availableOn pkgs.stdenv.hostPlatform package)
@@ -67,6 +85,7 @@
 
   allPackages =
     {
+      inherit minimeters pianoteq spleeterpp wineStagingPatched yabridgePatched yabridgectlPatched carla;
       amplocker = callPackage ../pkgs/amplocker.nix {};
       audiogridder = callPackage ../pkgs/audiogridder.nix {};
       auburn-sounds = auburnSounds;
@@ -80,7 +99,6 @@
       auburn-sounds-renegate = withPassthru auburnSoundsPackages.renegate.default auburnSoundsPackages.renegate;
       auburn-sounds-selene = withPassthru auburnSoundsPackages.selene.default auburnSoundsPackages.selene;
       bitwig6 = callPackage ../pkgs/bitwig6.nix {};
-      inherit carla;
       chow-tape-model = callPackage ../pkgs/chow-tape-model.nix {};
       drumlocker = callPackage ../pkgs/drumlocker.nix {};
       gvst = callPackage ../pkgs/gvst.nix {};
@@ -90,7 +108,6 @@
       inner-pitch-full = innerPitchPackages.full;
       js-inflator = callPackage ../pkgs/js-inflator.nix {};
       libonnxruntime-neuralnote = callPackage ../pkgs/neuralnote/libonnxruntime-neuralnote.nix {};
-      inherit minimeters;
       minimeters-demo = minimetersPackages.demo;
       minimeters-full = minimetersPackages.full;
       melissa = callPackage ../pkgs/melissa.nix {inherit spleeterpp;};
@@ -99,14 +116,12 @@
       neural-amp-modeler-lv2 = callPackage ../pkgs/neural-amp-modeler-lv2.nix {};
       neuralnote = callPackage ../pkgs/neuralnote/neuralnote.nix {};
       overwitch = callPackage ../pkgs/overwitch.nix {};
-      inherit pianoteq;
       pianoteq-standard = pianoteqPackages.standard;
       pianoteq-stage = pianoteqPackages.stage;
       pianoteq-trial = pianoteqPackages.trial;
       rubberband = callPackage ../pkgs/rubberband.nix {};
       spice-oss = callPackage ../pkgs/spice-oss.nix {};
       ultimate-vocal-remover-gui = callPackage ../pkgs/ultimate-vocal-remover-gui.nix {};
-      inherit spleeterpp;
     }
     // lib.optionalAttrs (lib.hasAttr system inputs.pulse-visualizer.packages) {
       pulse-visualizer = inputs.pulse-visualizer.packages.${system}.default;
