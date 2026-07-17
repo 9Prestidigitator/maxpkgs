@@ -17,7 +17,7 @@ All packages are available for the listed platforms. `x86_64-linux` and
 | `auburn-sounds-full` | same as free suite | x86_64-linux | Paid suite; see [Paid Packages](#paid-packages) |
 | `auburn-sounds-{selene,graillon,inner-pitch,lens,renegate,panagement,couture}` | corresponding suite version | x86_64-linux | Individual free editions; each has `.full`/`.paid` |
 | `bitwig6` | 6.1-beta4 | x86_64-linux | Bitwig Studio |
-| `carla-picker` | 2.5.9 | x86_64-linux | Carla with the patched file picker |
+| `carla` | 2.6.0-alpha1 (main, 2026-03-19) | Linux | Native LV2 path chooser |
 | `chow-tape-model` | 2.11.4 | x86_64-linux | Standalone, CLAP, LV2, VST3 |
 | `drumlocker` | 1.0.2 | x86_64-linux | LV2, VST3, and sample-data helper |
 | `gvst` | 2024-09-25 | x86_64-linux | VST2 suite |

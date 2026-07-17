@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "carla": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773943462,
+        "narHash": "sha256-Gsfka//OW84La3MA1gGkd5DZ4wQTdPAvLf32lfN2DGU=",
+        "owner": "falkTX",
+        "repo": "Carla",
+        "rev": "97a9e0740baf6df2df942495c02532a624c44682",
+        "type": "github"
+      },
+      "original": {
+        "owner": "falkTX",
+        "repo": "Carla",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "locked": {
         "lastModified": 1767039857,
@@ -133,22 +149,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-qtwebkit": {
-      "locked": {
-        "lastModified": 1782847189,
-        "narHash": "sha256-twXPFqFsrrY5r28Zh7Homgcp2gUMBgQ6WDS98Q/3xFI=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "b6018f87da91d19d0ab4cf979885689b469cdd41",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-25.11",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1773821835,
@@ -188,10 +188,10 @@
     },
     "root": {
       "inputs": {
+        "carla": "carla",
         "flake-parts": "flake-parts",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-qtwebkit": "nixpkgs-qtwebkit",
         "pulse-visualizer": "pulse-visualizer"
       }
     }

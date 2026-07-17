@@ -22,12 +22,10 @@
   spleeterpp = callPackage ../pkgs/spleeterpp.nix {};
 
   winePackages = import ./patches/wine.nix {inherit pkgs;};
-  # carlaPackages = import ./patches/carla.nix {inherit pkgs inputs;};
 
   allPackages =
     {
       inherit (winePackages) wineStagingPatched yabridgePatched yabridgectlPatched;
-      # inherit (carlaPackages) carla-picker;
 
       inherit minimeters pianoteq spleeterpp;
 
@@ -44,6 +42,7 @@
       auburn-sounds-renegate = withPassthru auburnSoundsPackages.renegate.default auburnSoundsPackages.renegate;
       auburn-sounds-selene = withPassthru auburnSoundsPackages.selene.default auburnSoundsPackages.selene;
       bitwig6 = callPackage ../pkgs/bitwig6.nix {};
+      carla = callPackage ../pkgs/carla.nix {src = inputs.carla;};
       chow-tape-model = callPackage ../pkgs/chow-tape-model.nix {};
       drumlocker = callPackage ../pkgs/drumlocker.nix {};
       gvst = callPackage ../pkgs/gvst.nix {};
