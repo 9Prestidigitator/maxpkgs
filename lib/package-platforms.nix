@@ -22,13 +22,15 @@
   spleeterpp = callPackage ../pkgs/spleeterpp.nix {};
 
   winePackages = import ./patches/wine.nix {inherit pkgs;};
-  carlaPackages = import ./patches/carla.nix {inherit pkgs inputs;};
+  # carlaPackages = import ./patches/carla.nix {inherit pkgs inputs;};
 
   allPackages =
     {
-      inherit minimeters pianoteq spleeterpp;
       inherit (winePackages) wineStagingPatched yabridgePatched yabridgectlPatched;
-      inherit (carlaPackages) carla;
+      # inherit (carlaPackages) carla-picker;
+
+      inherit minimeters pianoteq spleeterpp;
+
       amplocker = callPackage ../pkgs/amplocker.nix {};
       audiogridder = callPackage ../pkgs/audiogridder.nix {};
       auburn-sounds = auburnSounds;

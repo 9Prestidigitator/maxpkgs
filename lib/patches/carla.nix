@@ -4,7 +4,9 @@
 }: let
   system = pkgs.stdenv.hostPlatform.system;
 
-  # Fixes Carla's file picker for plugins such as Neural Amp Modeler.
+  # Fixes Carla's file picker for plugins such as Neural Amp Modeler. This is
+  # because qtwebit python package is unmaintained and thus not included in 
+  # modern nixpkgs.
   qtwebkitOverlay = final: prev: let
     patchedQt5 = prev.qt5.overrideScope (
       qtFinal: qtPrev: {
@@ -39,10 +41,11 @@
       ++ [pyqt5WithQtWebKit];
   });
 
-  carla = import ../../pkgs/carla.nix {
+  carla-picker = import ../../pkgs/carla.nix {
     upstreamCarla = legacyCarla;
     which = qtwebkitPkgs.which;
+    pipewireJack = qtwebkitPkgs.pipewire.jack;
   };
 in {
-  inherit carla;
+  inherit carla-picker;
 }

@@ -4,48 +4,44 @@ Personal Nix packages, overlay, and small NixOS modules for audio tools I use th
 
 This repo is Linux-audio heavy. Several packages are proprietary or otherwise unfree, so read the upstream license before using or redistributing anything.
 
-## What is included
+## Packages
 
-### Apps and Tools
+All packages are available for the listed platforms. `x86_64-linux` and
+`aarch64-linux` mean 64-bit Intel/AMD and ARM Linux, respectively.
 
-| Attribute                             | Upstream                                                                | Installs                                        | Notes                                                                                                                                |
-| ------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `bitwig6`                             | [Bitwig Studio](https://www.bitwig.com/)                                | DAW                                             | Linux `.deb` repackaged for Nix.                                                                                                     |
-| `overwitch`                           | [Overwitch](https://dagargo.github.io/overwitch/)                       | JACK client and helper tools                    | Includes `nixosModules.overwitch`.                                                                                                   |
-| `pianoteq`, `pianoteq-trial`          | [Modartt Pianoteq](https://www.modartt.com/pianoteq)                    | Standalone, LV2, VST3                           | Defaults to the Standard trial.                                                                                                      |
-| `pianoteq-standard`, `pianoteq-stage` | [Modartt Pianoteq](https://www.modartt.com/pianoteq)                    | Standalone, LV2, VST3                           | Paid downloads. See [Paid Packages](#paid-packages).                                                                                 |
-| `minimeters`, `minimeters-demo`       | [MiniMeters](https://minimeters.app/)                                   | Standalone, CLAP, VST3                          | Defaults to the free demo.                                                                                                           |
-| `minimeters-full`                     | [MiniMeters](https://minimeters.app/)                                   | Standalone, CLAP, VST3                          | Paid itch.io archive. See [Paid Packages](#paid-packages).                                                                           |
-| `pulse-visualizer`                    | [Pulse Visualizer](https://github.com/Audio-Solutions/pulse-visualizer) | Standalone visualizer                           | Uses the upstream flake package.                                                                                                     |
-| `neuralnote`                          | [NeuralNote](https://github.com/DamRsn/NeuralNote)                      | Standalone, VST3                                | Automatic transcription tool.                                                                                                        |
-| `melissa`                             | [Melissa](https://github.com/mosynthkey/Melissa)                        | Standalone practice player with stem separation | Built from upstream master for merged Linux support; uses packaged `spleeterpp`, TensorFlow C, and ONNX Runtime for stem separation. |
-
-### Audio Plugins
-
-| Attribute                                                                                                                                                                          | Upstream                                                                           | Installs                      | Notes                                                                                           |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------- |
-| `auburn-sounds`, `auburn-sounds-free`                                                                                                                                              | [Auburn Sounds](https://www.auburnsounds.com/)                                     | CLAP, LV2, VST2, VST3         | Free editions of the current suite.                                                             |
-| `auburn-sounds-full`                                                                                                                                                               | [Auburn Sounds](https://www.auburnsounds.com/)                                     | CLAP, LV2, VST2, VST3         | Paid full editions. See [Paid Packages](#paid-packages).                                        |
-| `auburn-sounds-selene`, `auburn-sounds-graillon`, `auburn-sounds-inner-pitch`, `auburn-sounds-lens`, `auburn-sounds-panagement`, `auburn-sounds-renegate`, `auburn-sounds-couture` | [Auburn Sounds](https://www.auburnsounds.com/)                                     | CLAP, LV2, VST2, VST3         | Individual free editions. Each also exposes `.full` and `.paid` passthru attrs.                 |
-| `inner-pitch`, `inner-pitch-free`, `inner-pitch-full`                                                                                                                              | [Auburn Sounds Inner Pitch](https://www.auburnsounds.com/products/InnerPitch.html) | CLAP, LV2, VST2, VST3         | Convenience aliases for the Auburn Sounds package.                                              |
-| `gvst`                                                                                                                                                                             | [GVST](https://gvst.uk/)                                                           | VST2                          | GVST Linux plugin suite.                                                                        |
-| `amplocker`                                                                                                                                                                        | [AudioAssault](https://audioassault.mx/)                                           | Standalone, LV2, VST3         | Free Amp Locker package.                                                                        |
-| `drumlocker`                                                                                                                                                                       | [AudioAssault Drum Locker](https://audioassault.mx/getdrumlocker)                  | LV2, VST3, sample data helper | Run `drum-locker-install-data` if the plugin needs writable sample data in your home directory. |
-| `mixlocker`                                                                                                                                                                        | [AudioAssault Mix Locker](https://audioassault.mx/getmixlocker)                    | LV2, VST3, preset/data helper | Run `mix-locker-install-data` if the plugin needs writable data in your home directory.         |
-| `mt-power-drumkit-2`                                                                                                                                                               | [MT Power Drum Kit 2](https://www.powerdrumkit.com/)                               | VST3                          | Free drum sampler plugin.                                                                       |
-| `chow-tape-model`                                                                                                                                                                  | [CHOW Tape Model](https://github.com/jatinchowdhury18/AnalogTapeModel)             | Standalone, CLAP, LV2, VST3   | Patched for the vendored JUCE `std::exchange` build failure.                                    |
-| `wolf-shaper`                                                                                                                                                                      | [Wolf Shaper](https://github.com/wolf-plugins/wolf-shaper)                         | Standalone, DSSI, LV2, VST2   | Spline-based waveshaper plugin.                                                                 |
-| `spice-oss`                                                                                                                                                                        | [Spice OSS](https://github.com/DatanoiseTV/spice-oss)                              | Standalone, LV2, VST3         | Analog saturation and cabinet simulation plugin.                                                |
-| `neural-amp-modeler-lv2`                                                                                                                                                           | [NAM LV2](https://github.com/mikeoliphant/neural-amp-modeler-lv2)                  | LV2                           | Neural Amp Modeler LV2 implementation.                                                          |
-| `js-inflator`                                                                                                                                                                      | [JS_Inflator](https://github.com/Kiriki-liszt/JS_Inflator)                         | VST3                          | Open source inflator effect.                                                                    |
-| `rubberband`                                                                                                                                                                       | [Rubber Band Library](https://breakfastquay.com/rubberband/)                       | Library and audio plugins     | Exposed as `rubberband-lv2` from the overlay to avoid clashing with nixpkgs.                    |
-
-### Support Libraries
-
-| Attribute                   | Upstream                                         | Notes                                             |
-| --------------------------- | ------------------------------------------------ | ------------------------------------------------- |
-| `libonnxruntime-neuralnote` | [ONNX Runtime](https://onnxruntime.ai/)          | Usually not installed directly.                   |
-| `spleeterpp`                | [spleeterpp](https://github.com/gvne/spleeterpp) | C++ Spleeter inference library used by `melissa`. |
+| Attribute | Version | Platforms | Provides |
+| --- | --- | --- | --- |
+| `amplocker` | 1.5.1 | x86_64-linux | Standalone, LV2, VST3 |
+| `audiogridder` | 1.2.0 | x86_64-linux | AudioGridder server and VST3 plug-in |
+| `auburn-sounds`, `auburn-sounds-free` | Selene 1.1; Graillon 3.2; Inner Pitch 2.1; Lens 1.4; Renegate 1.6; Panagement 2.8; Couture 1.10 | x86_64-linux | Free CLAP, LV2, VST2, and VST3 suite |
+| `auburn-sounds-full` | same as free suite | x86_64-linux | Paid suite; see [Paid Packages](#paid-packages) |
+| `auburn-sounds-{selene,graillon,inner-pitch,lens,renegate,panagement,couture}` | corresponding suite version | x86_64-linux | Individual free editions; each has `.full`/`.paid` |
+| `bitwig6` | 6.1-beta4 | x86_64-linux | Bitwig Studio |
+| `carla-picker` | 2.5.9 | x86_64-linux | Carla with the patched file picker |
+| `chow-tape-model` | 2.11.4 | x86_64-linux | Standalone, CLAP, LV2, VST3 |
+| `drumlocker` | 1.0.2 | x86_64-linux | LV2, VST3, and sample-data helper |
+| `gvst` | 2024-09-25 | x86_64-linux | VST2 suite |
+| `ildaeil` | unstable-2026-06-23 | Linux | Audio plug-in host |
+| `inner-pitch`, `inner-pitch-free`, `inner-pitch-full` | 2.1 | x86_64-linux | Auburn Sounds Inner Pitch aliases |
+| `js-inflator` | 2.0.3.2 | Linux | VST3 |
+| `libonnxruntime-neuralnote` | 1ac0228d5d07890c0a504fbdeb6588e00afe1b8a | x86_64-linux | NeuralNote support library |
+| `melissa` | 4.0.2-unstable-2026-06-16 | x86_64-linux | Standalone practice player with stem separation |
+| `minimeters`, `minimeters-demo` | 1.0.29 | x86_64-linux, aarch64-linux | Demo standalone, CLAP, VST3 |
+| `minimeters-full` | 1.0.29 | x86_64-linux, aarch64-linux | Paid standalone, CLAP, VST3; see [Paid Packages](#paid-packages) |
+| `mixlocker` | 1.0.7 | x86_64-linux | LV2, VST3, and preset/data helper |
+| `mt-power-drumkit-2` | 2.1.5.0 | x86_64-linux | VST3 |
+| `neural-amp-modeler-lv2` | v0.2.2 | Linux, Darwin | LV2 |
+| `neuralnote` | 1.1.0 | x86_64-linux | Standalone, VST3 |
+| `overwitch` | 2.2 | Linux | JACK client and helpers; includes `nixosModules.overwitch` |
+| `pianoteq`, `pianoteq-trial` | 9.1.2 | x86_64-linux, aarch64-linux | Standard trial: standalone, LV2, VST3 |
+| `pianoteq-standard`, `pianoteq-stage` | 9.1.2 | x86_64-linux, aarch64-linux | Paid standalone, LV2, VST3; see [Paid Packages](#paid-packages) |
+| `pulse-visualizer` | 3.9-50466f1-flake | All | Standalone visualizer |
+| `rubberband` (`rubberband-lv2` in overlay) | 4.0.0 | All | Library and audio plug-ins |
+| `spice-oss` | unstable-2026-06-16 | Linux | Standalone, LV2, VST3 |
+| `spleeterpp` | 0.2.1-unstable-2026-06-16 | x86_64-linux | Melissa support library |
+| `ultimate-vocal-remover-gui` | 5.6.0 | x86_64-linux | Standalone source-separation GUI |
+| `wineStagingPatched` | 11.1 | x86_64-linux, aarch64-linux | Wine staging with the yabridge cursor fix |
+| `yabridgePatched`, `yabridgectlPatched` | 5.1.1 | x86_64-linux | Windows plug-in bridge and control tool |
 
 ## Quick Start
 
@@ -121,20 +117,15 @@ The Overwitch NixOS module installs the package, adds the udev rules, and starts
 
 ## Paid Packages
 
-Paid packages are not redistributed from this repository. The Nix expressions describe how to install files you already have access to, but you must provide your own licensed downloads or credentials.
+Paid binaries are not redistributed. Purchase them yourself, then provide the
+matching archive hash when overriding the package. Hashes are safe in Nix code;
+credentials and license keys are not. A built paid package is still stored in
+the Nix store.
 
-Hashes are not secrets. They can live in your flake, host config, or overlay. Credentials and license keys are secrets and should not be interpolated into Nix expressions, derivation arguments, `environment.variables`, or files generated in the Nix store.
+> [!NOTE]
+> The paid package paths are untested here.
 
-Normal derivations cannot safely read `/run/secrets` or `/run/current-system/secrets`: those paths exist at activation/runtime, while system packages must be built before activation. If a paid plugin is installed as a Nix package, the paid plugin binary itself will be present in the Nix store.
-
-For sops-nix or agenix, use secret files for runtime credentials or daemon environment files, and keep only fixed-output hashes in Nix code.
-
-> [!ATTENTION]
-> These paid packages have not officially been tested yet, as I have not purchased them myself yet.
-
-### Hash Overrides
-
-Paid package hashes are configurable as package arguments, so you do not need to edit package files.
+### Configure a package
 
 ```nix
 {pkgs, ...}: let
@@ -164,135 +155,34 @@ in {
 }
 ```
 
-### MiniMeters Full
+### Local archives: MiniMeters and Auburn Sounds
 
-`minimeters` and `minimeters-demo` build the public demo. `minimeters-full` uses the paid Linux archive from itch.io via `requireFile`.
-
-1. Purchase MiniMeters from [directmusic.itch.io/minimeters](https://directmusic.itch.io/minimeters).
-2. Download the Linux archive:
-   - `minimeters-linux.zip` on `x86_64-linux`
-   - `minimeters-linux-arm64.zip` on `aarch64-linux`
-3. Compute the hash:
+Download the archive from the vendor, calculate its SRI hash, and add it to the
+store before building:
 
 ```sh
-nix hash file --type sha256 --sri ~/Downloads/minimeters-linux.zip
+nix hash file --type sha256 --sri ~/Downloads/ARCHIVE.zip
+nix-store --add-fixed sha256 ~/Downloads/ARCHIVE.zip
 ```
 
-4. Override `paidHash` with that hash.
-5. Add the archive to the Nix store and build:
-
-```sh
-nix-store --add-fixed sha256 ~/Downloads/minimeters-linux.zip
-nix build --impure --expr '
-let
-  flake = builtins.getFlake "git+file:///path/to/maxpkgs";
-in
-  (flake.packages.x86_64-linux.minimeters.override {
-    paidHash = "sha256-...";
-  }).full
-'
-```
-
-### Auburn Sounds Full Editions
-
-The free Auburn Sounds attrs build directly. Paid full editions use local itch.io archives via `requireFile`.
-
-For one plugin, override the relevant `fullHashes` entry:
-
-```sh
-nix hash file --type sha256 --sri ~/Downloads/Selene-FULL-1.1.zip
-nix-store --add-fixed sha256 ~/Downloads/Selene-FULL-1.1.zip
-nix build --impure --expr '
-let
-  flake = builtins.getFlake "git+file:///path/to/maxpkgs";
-in
-  (flake.packages.x86_64-linux.auburn-sounds.override {
-    fullHashes.selene = "sha256-...";
-  }).selene.full
-'
-```
-
-For the whole paid suite, override every required `fullHashes` entry, add every `*-FULL-*.zip` file to the store, then build the overridden package set's `full` attr.
-
-```nix
-pkgs.auburn-sounds.override {
-  fullHashes = {
-    selene = "sha256-...";
-    graillon = "sha256-...";
-    "inner-pitch" = "sha256-...";
-    lens = "sha256-...";
-    renegate = "sha256-...";
-    panagement = "sha256-...";
-    couture = "sha256-...";
-  };
-}
-```
-
-`inner-pitch-full` is available as a top-level convenience attr for the paid Inner Pitch package.
+Use that hash as `minimeters.paidHash` or the relevant
+`auburn-sounds.fullHashes` entry. MiniMeters uses
+`minimeters-linux.zip` on x86_64 and `minimeters-linux-arm64.zip` on ARM.
+Auburn Sounds uses the product's `*-FULL-<version>.zip` archive. The free
+editions need no override; `inner-pitch-full` is a convenient alias for the
+paid Inner Pitch edition.
 
 ### Pianoteq Standard and Stage
 
-`pianoteq` and `pianoteq-trial` use the public Standard trial. Paid Pianoteq builds log into Modartt with `NIX_MODARTT_USERNAME` and `NIX_MODARTT_PASSWORD`, then fetch the account-specific archive as a fixed-output derivation.
+`pianoteq` and `pianoteq-trial` are the public Standard trial. The paid
+packages download from your Modartt account using
+`NIX_MODARTT_USERNAME` and `NIX_MODARTT_PASSWORD` in the local Nix daemon
+environment, then need the resulting hash in the `hashes` override above.
 
-For sops-nix or agenix, store a dotenv-style secret file outside the store:
-
-```sh
-NIX_MODARTT_USERNAME=you@example.com
-NIX_MODARTT_PASSWORD=your-password
-```
-
-Then point the Nix daemon at that runtime file. With sops-nix this is typically:
-
-```nix
-{config, ...}: {
-  sops.secrets.modartt-env = {
-    sopsFile = ./secrets.yaml;
-    key = "modartt/env";
-    mode = "0400";
-  };
-
-  systemd.services.nix-daemon.serviceConfig.EnvironmentFile =
-    config.sops.secrets.modartt-env.path;
-}
-```
-
-With agenix:
-
-```nix
-{config, ...}: {
-  age.secrets.modartt-env.file = ./secrets/modartt-env.age;
-
-  systemd.services.nix-daemon.serviceConfig.EnvironmentFile =
-    config.age.secrets.modartt-env.path;
-}
-```
-
-This keeps the secret file out of the store, but it still makes those environment variables available to the local Nix daemon for derivations that explicitly allow them through `impureEnvVars`. Use this only on trusted local builders. Do not use remote builders or public binary caches for these builds. Restart `nix-daemon` after changing the environment file wiring or secret contents.
-
-For ad-hoc local builds, a direct systemd override works too:
-
-```ini
-[Service]
-Environment=NIX_MODARTT_USERNAME=you@example.com
-Environment=NIX_MODARTT_PASSWORD=your-password
-```
-
-Then build once:
-
-```sh
-nix build .#pianoteq-standard
-```
-
-The first build with `lib.fakeHash` will fetch the archive and fail with the actual hash. Put that hash in your package override, then rebuild:
-
-```nix
-pkgs.pianoteq.override {
-  hashes = {
-    standard_9 = "sha256-...";
-    stage_9 = "sha256-...";
-  };
-}
-```
+Keep these credentials in a secret-manager-generated `EnvironmentFile` for
+`nix-daemon`, outside the Nix store. Use only trusted local builders and do not
+use remote builders or public binary caches for these builds. After updating
+the environment file, restart `nix-daemon`.
 
 ## Inspirations
 
