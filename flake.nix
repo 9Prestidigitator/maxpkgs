@@ -6,6 +6,8 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";
     pulse-visualizer.url = "github:Audio-Solutions/pulse-visualizer";
+
+    nixpkgs-qtwebkit.url = "github:NixOS/nixpkgs/nixos-25.11";
   };
 
   outputs = inputs:

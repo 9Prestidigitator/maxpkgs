@@ -4,10 +4,13 @@
   filterByPlatform ? true,
 }: let
   inherit (pkgs) lib callPackage;
+  system = pkgs.stdenv.hostPlatform.system;
+
   withPassthru = package: passthru:
     package.overrideAttrs (oldAttrs: {
       passthru = (oldAttrs.passthru or {}) // passthru;
     });
+
   auburnSoundsPackages = callPackage ../pkgs/auburn-sounds.nix {};
   auburnSounds = withPassthru auburnSoundsPackages.default auburnSoundsPackages;
   innerPitchPackages = auburnSoundsPackages.inner-pitch;
@@ -17,11 +20,35 @@
   pianoteqPackages = callPackage ../pkgs/pianoteq.nix {};
   pianoteq = withPassthru pianoteqPackages.default pianoteqPackages;
   spleeterpp = callPackage ../pkgs/spleeterpp.nix {};
-  system = pkgs.stdenv.hostPlatform.system;
+
   availablePackages =
     lib.filterAttrs
     (_: package: lib.meta.availableOn pkgs.stdenv.hostPlatform package)
     allPackages;
+
+  qtwebkitPkgs = import inputs.nixpkgs-qtwebkit {
+    inherit system;
+    config = {
+      allowUnfree = true;
+      permittedInsecurePackages = [
+        "qtwebkit-5.212.0-alpha4"
+      ];
+    };
+  };
+
+  legacyCarla = qtwebkitPkgs.carla.overrideAttrs (oldAttrs: {
+    pythonPath =
+      oldAttrs.pythonPath
+      ++ [
+        qtwebkitPkgs.python3Packages."pyqt5-webkit"
+      ];
+  });
+
+  carla = import ../pkgs/carla.nix {
+    upstreamCarla = legacyCarla;
+    which = qtwebkitPkgs.which;
+  };
+
   allPackages =
     {
       amplocker = callPackage ../pkgs/amplocker.nix {};
@@ -37,7 +64,7 @@
       auburn-sounds-renegate = withPassthru auburnSoundsPackages.renegate.default auburnSoundsPackages.renegate;
       auburn-sounds-selene = withPassthru auburnSoundsPackages.selene.default auburnSoundsPackages.selene;
       bitwig6 = callPackage ../pkgs/bitwig6.nix {};
-      carla = callPackage ../pkgs/carla.nix {upstreamCarla = pkgs.carla;};
+      inherit carla;
       chow-tape-model = callPackage ../pkgs/chow-tape-model.nix {};
       drumlocker = callPackage ../pkgs/drumlocker.nix {};
       gvst = callPackage ../pkgs/gvst.nix {};
