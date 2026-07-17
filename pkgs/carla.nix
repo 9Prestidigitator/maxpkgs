@@ -1,8 +1,8 @@
 {
-  carla,
+  upstreamCarla,
   which,
 }:
-carla.overrideAttrs (oldAttrs: {
+upstreamCarla.overrideAttrs (oldAttrs: {
   postFixup = (oldAttrs.postFixup or "") + ''
     wrapQtApp "$out/lib/carla/carla-bridge-lv2-modgui" \
       --prefix PATH : "$program_PATH:${which}/bin" \
