@@ -21,73 +21,14 @@
   pianoteq = withPassthru pianoteqPackages.default pianoteqPackages;
   spleeterpp = callPackage ../pkgs/spleeterpp.nix {};
 
-  availablePackages =
-    lib.filterAttrs
-    (_: package: lib.meta.availableOn pkgs.stdenv.hostPlatform package)
-    allPackages;
-
-  # This wine patch lets you use the latest version of wine with yabridge. It fixes the cursor window misplacement glitch that required 9.21.
-  wineStagingPatched = (pkgs.wineWow64Packages.base.override {wineRelease = "staging";}).overrideAttrs (old: {
-    patches =
-      (old.patches or [])
-      ++ [
-        (pkgs.fetchurl {
-          url = "https://gitlab.winehq.org/-/project/5/uploads/dea8a1e711846f7e7642c16eacd284b4/bug51357.patch";
-          hash = "sha256-ZfW94gCDLGauKEZOid7ndQsaPA6SVGk22CQ3EBWAPm8=";
-        })
-      ];
-  });
-  wineSetPatched = pkgs.wineWow64Packages // {yabridge = wineStagingPatched;};
-
-  yabridgePatched = pkgs.yabridge.override {wineWow64Packages = wineSetPatched;};
-  yabridgectlPatched = pkgs.yabridgectl.override {
-    wineWow64Packages = wineSetPatched;
-    yabridge = yabridgePatched;
-  };
-
-  # This carla patch fixes the file picker not appearing for plugins such as Nueral Amp Modeler.
-  qtwebkitOverlay = final: prev: let
-    patchedQt5 = prev.qt5.overrideScope (
-      qtFinal: qtPrev: {
-        qtwebkit = qtPrev.qtwebkit.overrideAttrs (oldAttrs: {
-          patches = (oldAttrs.patches or []) ++ [../patches/qtwebkit-ruby32.patch];
-        });
-      }
-    );
-  in {
-    qt5 = patchedQt5;
-    libsForQt5 = patchedQt5;
-  };
-
-  qtwebkitPkgs = import inputs.nixpkgs-qtwebkit {
-    inherit system;
-
-    overlays = [qtwebkitOverlay];
-
-    config = {
-      allowUnfree = true;
-      permittedInsecurePackages = ["qtwebkit-5.212.0-alpha4"];
-    };
-  };
-
-  pyqt5WithQtWebKit =
-    qtwebkitPkgs.python3Packages."pyqt5-webkit"
-  or qtwebkitPkgs.python3Packages.pyqt5_with_qtwebkit;
-
-  legacyCarla = qtwebkitPkgs.carla.overrideAttrs (oldAttrs: {
-    pythonPath =
-      oldAttrs.pythonPath
-      ++ [pyqt5WithQtWebKit];
-  });
-
-  carla = import ../pkgs/carla.nix {
-    upstreamCarla = legacyCarla;
-    which = qtwebkitPkgs.which;
-  };
+  winePackages = import ./patches/wine.nix {inherit pkgs;};
+  carlaPackages = import ./patches/carla.nix {inherit pkgs inputs;};
 
   allPackages =
     {
-      inherit minimeters pianoteq spleeterpp wineStagingPatched yabridgePatched yabridgectlPatched carla;
+      inherit minimeters pianoteq spleeterpp;
+      inherit (winePackages) wineStagingPatched yabridgePatched yabridgectlPatched;
+      inherit (carlaPackages) carla;
       amplocker = callPackage ../pkgs/amplocker.nix {};
       audiogridder = callPackage ../pkgs/audiogridder.nix {};
       auburn-sounds = auburnSounds;
@@ -128,6 +69,11 @@
     // lib.optionalAttrs (lib.hasAttr system inputs.pulse-visualizer.packages) {
       pulse-visualizer = inputs.pulse-visualizer.packages.${system}.default;
     };
+
+  availablePackages =
+    lib.filterAttrs
+    (_: package: lib.meta.availableOn pkgs.stdenv.hostPlatform package)
+    allPackages;
 in
   if filterByPlatform
   then availablePackages
