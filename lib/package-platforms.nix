@@ -21,6 +21,12 @@
   pianoteq = withPassthru pianoteqPackages.default pianoteqPackages;
   spleeterpp = callPackage ../pkgs/spleeterpp.nix {};
 
+  availablePackages =
+    lib.filterAttrs
+    (_: package: lib.meta.availableOn pkgs.stdenv.hostPlatform package)
+    allPackages;
+
+  # This wine patch lets you use the latest version of wine with yabridge. It fixes the cursor window misplacement glitch that required 9.21.
   wineStagingPatched = (pkgs.wineWow64Packages.base.override {wineRelease = "staging";}).overrideAttrs (old: {
     patches =
       (old.patches or [])
@@ -39,11 +45,7 @@
     yabridge = yabridgePatched;
   };
 
-  availablePackages =
-    lib.filterAttrs
-    (_: package: lib.meta.availableOn pkgs.stdenv.hostPlatform package)
-    allPackages;
-
+  # This carla patch fixes the file picker not appearing for plugins such as Nueral Amp Modeler.
   qtwebkitOverlay = final: prev: let
     patchedQt5 = prev.qt5.overrideScope (
       qtFinal: qtPrev: {
