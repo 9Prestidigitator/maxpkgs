@@ -42,7 +42,6 @@
       auburn-sounds-renegate = withPassthru auburnSoundsPackages.renegate.default auburnSoundsPackages.renegate;
       auburn-sounds-selene = withPassthru auburnSoundsPackages.selene.default auburnSoundsPackages.selene;
       bitwig6 = callPackage ../pkgs/bitwig6.nix {};
-      carla = callPackage ../pkgs/carla.nix {src = inputs.carla;};
       chow-tape-model = callPackage ../pkgs/chow-tape-model.nix {};
       drumlocker = callPackage ../pkgs/drumlocker.nix {};
       gvst = callPackage ../pkgs/gvst.nix {};

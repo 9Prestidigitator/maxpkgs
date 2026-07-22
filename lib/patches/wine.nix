@@ -1,6 +1,8 @@
 {pkgs}: let
   # This patch lets yabridge use current Wine staging releases without the
   # cursor-window placement regression that previously required Wine 9.21.
+  # Ended up resulting in a lot of new issues when opening and closing plugins,
+  # so I'm probably not going to keep using this.
   wineStagingPatched = (pkgs.wineWow64Packages.base.override {wineRelease = "staging";}).overrideAttrs (old: {
     patches =
       (old.patches or [])
