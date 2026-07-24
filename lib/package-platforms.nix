@@ -20,6 +20,7 @@
   pianoteqPackages = callPackage ../pkgs/pianoteq.nix {};
   pianoteq = withPassthru pianoteqPackages.default pianoteqPackages;
   spleeterpp = callPackage ../pkgs/spleeterpp.nix {};
+  neuralAmpModelerLv2 = callPackage ../pkgs/neural-amp-modeler-lv2.nix {};
 
   winePackages = import ./patches/wine.nix {inherit pkgs;};
 
@@ -56,7 +57,10 @@
       melissa = callPackage ../pkgs/melissa.nix {inherit spleeterpp;};
       mixlocker = callPackage ../pkgs/mixlocker.nix {};
       mt-power-drumkit-2 = callPackage ../pkgs/mt-power-drumkit-2.nix {};
-      neural-amp-modeler-lv2 = callPackage ../pkgs/neural-amp-modeler-lv2.nix {};
+      neural-amp-modeler-lv2 = neuralAmpModelerLv2;
+      neural-amp-modeler-ui = callPackage ../pkgs/neural-amp-modeler-ui.nix {
+        neural-amp-modeler-lv2 = neuralAmpModelerLv2;
+      };
       neuralnote = callPackage ../pkgs/neuralnote/neuralnote.nix {};
       overwitch = callPackage ../pkgs/overwitch.nix {};
       pianoteq-standard = pianoteqPackages.standard;

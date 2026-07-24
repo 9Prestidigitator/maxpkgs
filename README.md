@@ -30,6 +30,7 @@ All packages are available for the listed platforms. `x86_64-linux` and
 | `mixlocker` | 1.0.7 | x86_64-linux | LV2, VST3, and preset/data helper |
 | `mt-power-drumkit-2` | 2.1.5.1 | x86_64-linux | VST3 |
 | `neural-amp-modeler-lv2` | v0.2.3 | Linux, Darwin | LV2 |
+| `neural-amp-modeler-ui` | unstable-2026-06-07 | Linux | LV2 with X11 UI |
 | `neuralnote` | 1.1.0 | x86_64-linux | Standalone, VST3 |
 | `overwitch` | 2.2 | Linux | JACK client and helpers; includes `nixosModules.overwitch` |
 | `pianoteq`, `pianoteq-trial` | 9.1.2 | x86_64-linux, aarch64-linux | Standard trial: standalone, LV2, VST3 |
