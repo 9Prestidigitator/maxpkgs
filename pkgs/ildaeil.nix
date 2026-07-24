@@ -42,6 +42,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   makeFlags = [
+    "AR=gcc-ar"
     "PREFIX=$(out)"
   ];
 
