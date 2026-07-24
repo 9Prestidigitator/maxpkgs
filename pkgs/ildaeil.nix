@@ -49,6 +49,14 @@ stdenv.mkDerivation (finalAttrs: {
   postPatch = ''
     patchShebangs dpf/utils
 
+    # jackbridge.a and jackbridge.min.a share JackBridge2.cpp.o. Building
+    # them concurrently can leave the latter with a corrupt symbol index.
+    substituteInPlace carla/Makefile \
+      --replace-fail \
+        '$(MODULEDIR)/jackbridge.%.a: .FORCE' \
+        '$(MODULEDIR)/jackbridge.min.a: $(MODULEDIR)/jackbridge.a
+    $(MODULEDIR)/jackbridge.%.a: .FORCE'
+
     substituteInPlace plugins/Common/IldaeilPlugin.cpp \
       --replace-fail \
         'path = getHomePath() + "/.lv2:/usr/lib/lv2:/usr/local/lib/lv2";' \
