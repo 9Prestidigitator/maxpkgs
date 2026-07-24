@@ -31,7 +31,7 @@
       x86_64-linux = {
         demoFileName = "minimeters-linux-demo.zip";
         demoUploadId = "5758513";
-        demoHash = "sha256-yzXLGuSMFIZc1FRhbBUCs+HLpWIowT79nh2P/iBeSJg=";
+        demoHash = "sha256-3LHiWL42yrj1EkcqpPfa/3KY3s9wE9+XW1KGNAQmWaE=";
         paidFileName = "minimeters-linux.zip";
       };
       aarch64-linux = {
