@@ -23,7 +23,7 @@
   writeShellScript,
   paidHash ? lib.fakeHash,
 }: let
-  version = "1.0.29";
+  version = "1.0.30";
   homepage = "https://minimeters.app/";
 
   platformInfo =
@@ -37,7 +37,7 @@
       aarch64-linux = {
         demoFileName = "minimeters-linux-arm64-demo.zip";
         demoUploadId = "14484397";
-        demoHash = "sha256-5xNk/PjwIhnQZieqsa+Qi6s0ivSm6nqONUw9+vimTpM=";
+        demoHash = "sha256-tnnqfwusHq1IL5BC8fbhqzJOxLqeDT5Ev7Es9zDywCA=";
         paidFileName = "minimeters-linux-arm64.zip";
       };
     }

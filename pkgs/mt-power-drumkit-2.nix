@@ -16,11 +16,11 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "mt-power-drumkit-2";
-  version = "2.1.5.0";
+  version = "2.1.5.1";
 
   src = fetchurl {
     url = "https://cdn1.resources.manda-audio.com/DOWNLOADS/products/mtpdk2_free/2.1.5/MTPDK-${finalAttrs.version}-VST3-64bit-Linux-FULL.zip";
-    hash = "sha256-kL+1M4s+d28rHuhW4yuCxDa2he3Q2uYVty3aENFCzUQ=";
+    hash = "sha256-lb8RuIdLgDC2y9KSF6hlWXWKlt4jI8tndWk/WVanpGo=";
   };
 
   nativeBuildInputs = [

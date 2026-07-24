@@ -17,7 +17,6 @@ All packages are available for the listed platforms. `x86_64-linux` and
 | `auburn-sounds-full` | same as free suite | x86_64-linux | Paid suite; see [Paid Packages](#paid-packages) |
 | `auburn-sounds-{selene,graillon,inner-pitch,lens,renegate,panagement,couture}` | corresponding suite version | x86_64-linux | Individual free editions; each has `.full`/`.paid` |
 | `bitwig6` | 6.1-beta4 | x86_64-linux | Bitwig Studio |
-| `carla` | 2.6.0-alpha1 (main, 2026-03-19) | Linux | Native LV2 path chooser |
 | `chow-tape-model` | 2.11.4 | x86_64-linux | Standalone, CLAP, LV2, VST3 |
 | `drumlocker` | 1.0.2 | x86_64-linux | LV2, VST3, and sample-data helper |
 | `gvst` | 2024-09-25 | x86_64-linux | VST2 suite |
@@ -25,22 +24,22 @@ All packages are available for the listed platforms. `x86_64-linux` and
 | `inner-pitch`, `inner-pitch-free`, `inner-pitch-full` | 2.1 | x86_64-linux | Auburn Sounds Inner Pitch aliases |
 | `js-inflator` | 2.0.3.2 | Linux | VST3 |
 | `libonnxruntime-neuralnote` | 1ac0228d5d07890c0a504fbdeb6588e00afe1b8a | x86_64-linux | NeuralNote support library |
-| `melissa` | 4.0.2-unstable-2026-06-16 | x86_64-linux | Standalone practice player with stem separation |
-| `minimeters`, `minimeters-demo` | 1.0.29 | x86_64-linux, aarch64-linux | Demo standalone, CLAP, VST3 |
-| `minimeters-full` | 1.0.29 | x86_64-linux, aarch64-linux | Paid standalone, CLAP, VST3; see [Paid Packages](#paid-packages) |
+| `melissa` | 4.5.0 | x86_64-linux | Standalone practice player with stem separation |
+| `minimeters`, `minimeters-demo` | 1.0.30 | x86_64-linux, aarch64-linux | Demo standalone, CLAP, VST3 |
+| `minimeters-full` | 1.0.30 | x86_64-linux, aarch64-linux | Paid standalone, CLAP, VST3; see [Paid Packages](#paid-packages) |
 | `mixlocker` | 1.0.7 | x86_64-linux | LV2, VST3, and preset/data helper |
-| `mt-power-drumkit-2` | 2.1.5.0 | x86_64-linux | VST3 |
-| `neural-amp-modeler-lv2` | v0.2.2 | Linux, Darwin | LV2 |
+| `mt-power-drumkit-2` | 2.1.5.1 | x86_64-linux | VST3 |
+| `neural-amp-modeler-lv2` | v0.2.3 | Linux, Darwin | LV2 |
 | `neuralnote` | 1.1.0 | x86_64-linux | Standalone, VST3 |
 | `overwitch` | 2.2 | Linux | JACK client and helpers; includes `nixosModules.overwitch` |
 | `pianoteq`, `pianoteq-trial` | 9.1.2 | x86_64-linux, aarch64-linux | Standard trial: standalone, LV2, VST3 |
 | `pianoteq-standard`, `pianoteq-stage` | 9.1.2 | x86_64-linux, aarch64-linux | Paid standalone, LV2, VST3; see [Paid Packages](#paid-packages) |
-| `pulse-visualizer` | 3.9-50466f1-flake | All | Standalone visualizer |
+| `pulse-visualizer` | 1.3.9-50466f1-flake | All | Standalone visualizer |
 | `rubberband` (`rubberband-lv2` in overlay) | 4.0.0 | All | Library and audio plug-ins |
 | `spice-oss` | unstable-2026-06-16 | Linux | Standalone, LV2, VST3 |
 | `spleeterpp` | 0.2.1-unstable-2026-06-16 | x86_64-linux | Melissa support library |
 | `ultimate-vocal-remover-gui` | 5.6.0 | x86_64-linux | Standalone source-separation GUI |
-| `wineStagingPatched` | 11.1 | x86_64-linux, aarch64-linux | Wine staging with the yabridge cursor fix |
+| `wineStagingPatched` | 11.12 | x86_64-linux, aarch64-linux | Wine staging with the yabridge cursor fix |
 | `yabridgePatched`, `yabridgectlPatched` | 5.1.1 | x86_64-linux | Windows plug-in bridge and control tool |
 
 ## Quick Start

@@ -87,14 +87,14 @@
 in
   stdenv.mkDerivation (finalAttrs: {
     pname = "eden";
-    version = "0.2.0";
+    version = "0.2.1";
 
     src = fetchFromGitea {
       domain = "git.eden-emu.dev";
       owner = "eden-emu";
       repo = "eden";
       tag = "v${finalAttrs.version}";
-      hash = "sha256-tkro7ZHgn2809Utf/Li5+OiseywyQKH15eqphxlJZQQ=";
+      hash = "sha256-79/JmIRWysoc3psJqMFyiNc2gjTY4VhJfdNaiTvisMk=";
     };
 
     nativeBuildInputs = [
@@ -127,6 +127,7 @@ in
         nlohmann_json
         openssl
         qt6.qtbase
+        qt6.qtcharts
         qt6.qtmultimedia
         qt6.qtwayland
         qt6.qtwebengine

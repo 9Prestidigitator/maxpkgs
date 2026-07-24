@@ -25,14 +25,21 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "melissa";
-  version = "4.0.2-unstable-2026-06-16";
+  version = "4.5.0";
 
   src = fetchFromGitHub {
     owner = "mosynthkey";
     repo = "Melissa";
-    rev = "67133449ad02e23f873308ca130874213479386c";
-    hash = "sha256-TC6IHbJ2YXCwAJswFzCSdHLuCFdxAxtH8aplzYNghA0=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-hWn2k8xkYW//ViSZavEchguK9UKMIJbodkWrsE9i0OE=";
     fetchSubmodules = true;
+  };
+
+  signalsmithLinear = fetchFromGitHub {
+    owner = "Signalsmith-Audio";
+    repo = "linear";
+    tag = "0.3.1";
+    hash = "sha256-m8zQJeZCQcHIwcGq17F2bmuZc4g7mFsxzRCUEpUrkr4=";
   };
 
   nativeBuildInputs = [
@@ -64,6 +71,10 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   postPatch = ''
+    cp -r ${finalAttrs.signalsmithLinear} Submodule/signalsmith-linear
+    chmod -R u+w Submodule/signalsmith-linear
+    sed -i '1i#include <cstring>' Submodule/signalsmith-linear/fft.h
+
     substituteInPlace CMakeLists.txt \
       --replace-fail "ThirdParty/spleeterpp/include" "${spleeterpp}/include" \
       --replace-fail "ThirdParty/libtensorflow-cpu-darwin-universal-binary-2.8.0/include" "${spleeterpp}/include" \
@@ -81,6 +92,12 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace Source/UI/MelissaStemSeparationSelectComponent.cpp \
       --replace-fail 'addAndMakeVisible(optionButtons_[kOption_Demucs].get());' \
         'addChildComponent(optionButtons_[kOption_Demucs].get());'
+
+    substituteInPlace Submodule/signalsmith-stretch/CMakeLists.txt \
+      --replace-fail 'GIT_REPOSITORY https://github.com/Signalsmith-Audio/linear.git' \
+        "SOURCE_DIR $PWD/Submodule/signalsmith-linear" \
+      --replace-fail 'GIT_TAG 0.3.1' "" \
+      --replace-fail 'GIT_SHALLOW ON' ""
   '';
 
   cmakeFlags = [
@@ -135,10 +152,6 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Music player for musical instrument practice";
     homepage = "https://github.com/mosynthkey/Melissa";
-    longDescription = ''
-      Built from upstream master because Linux support has not been released in a
-      tagged version yet.
-    '';
     license = lib.licenses.lgpl21Only;
     platforms = ["x86_64-linux"];
     mainProgram = "Melissa";
