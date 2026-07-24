@@ -49,5 +49,8 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/brummer10/neural-amp-modeler-ui";
     license = lib.licenses.bsd0;
     platforms = lib.platforms.linux;
+    # This output contains the DSP plugin too, so it must win profile
+    # collisions when both packages are installed.
+    priority = -10;
   };
 })
