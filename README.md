@@ -104,6 +104,14 @@ Most DAWs need their plugin scan paths pointed at the active profile or system p
 
 For Home Manager or user-profile installs, use the matching paths under `~/.nix-profile/lib` or `$HOME/.local/state/nix/profile/lib`.
 
+## Serum 2
+
+Serum 2 uses `/usr/bin/zenity` or `/usr/bin/kdialog` for authentication and preset file dialogs. On NixOS, launch your DAW through `steam-run` so those FHS helper paths are available; otherwise authentication and preset saving may not work:
+
+```sh
+steam-run reaper
+```
+
 ## Overwitch Module
 
 The Overwitch NixOS module installs the package, adds the udev rules, and starts the user service after PipeWire:
