@@ -264,7 +264,7 @@
   version6 = "6.7.3";
   version7 = "7.5.4";
   version8 = "8.4.0";
-  version9 = "9.1.2";
+  version9 = "9.2.1";
 
   mkStandard = version: hash:
     mkPianoteq {
@@ -313,7 +313,7 @@
 in rec {
   standard_9 = mkStandard version9 (hashes.standard_9 or lib.fakeHash);
   stage_9 = mkStage version9 (hashes.stage_9 or lib.fakeHash);
-  standard-trial_9 = mkStandardTrial version9 (hashes."standard-trial_9" or "sha256-1ofPL6F12Gv+k2rZBadOa5Iyukuji6vdww87ufdKjM8=");
+  standard-trial_9 = mkStandardTrial version9 (hashes."standard-trial_9" or "sha256-QQMLYvn7KW7u4JYeNCqxE+7Yn36bR+bTA2bP2IcQGZg=");
   stage-trial_9 = mkStageTrial version9 (hashes."stage-trial_9" or lib.fakeHash);
 
   standard_8 = mkStandard version8 (hashes.standard_8 or "sha256-ZDGB/SOOz+sWz7P+sNzyaipEH452n8zq5LleO3ztSXc=");
