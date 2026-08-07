@@ -67,6 +67,7 @@
       pianoteq-stage = pianoteqPackages.stage;
       pianoteq-trial = pianoteqPackages.trial;
       rubberband = callPackage ../pkgs/rubberband.nix {};
+      serum2 = callPackage ../pkgs/serum2.nix {};
       spice-oss = callPackage ../pkgs/spice-oss.nix {};
       ultimate-vocal-remover-gui = callPackage ../pkgs/ultimate-vocal-remover-gui.nix {};
     }
