@@ -37,7 +37,7 @@ All packages are available for the listed platforms. `x86_64-linux` and
 | `pianoteq-standard`, `pianoteq-stage`                                          | 9.2.1                                                                                           | x86_64-linux, aarch64-linux | Paid standalone, LV2, VST3; see [Paid Packages](#paid-packages)  |
 | `pulse-visualizer`                                                             | 1.3.9-50466f1-flake                                                                             | All                         | Standalone visualizer                                            |
 | `rubberband` (`rubberband-lv2` in overlay)                                     | 4.0.0                                                                                           | All                         | Library and audio plug-ins                                       |
-| `serum2`                                                                        | 2.1.5-beta                                                                                      | x86_64-linux                | Serum 2 Linux beta VST3                                          |
+| `serum2`                                                                        | 2.1.5-beta-2026-08-14                                                                           | x86_64-linux                | Serum 2 Linux beta VST3                                          |
 | `spice-oss`                                                                    | unstable-2026-06-16                                                                             | Linux                       | Standalone, LV2, VST3                                            |
 | `spleeterpp`                                                                   | 0.2.1-unstable-2026-06-16                                                                       | x86_64-linux                | Melissa support library                                          |
 | `ultimate-vocal-remover-gui`                                                   | 5.6.0                                                                                           | x86_64-linux                | Standalone source-separation GUI                                 |
@@ -103,14 +103,6 @@ Most DAWs need their plugin scan paths pointed at the active profile or system p
 | VST3   | `/run/current-system/sw/lib/vst3` |
 
 For Home Manager or user-profile installs, use the matching paths under `~/.nix-profile/lib` or `$HOME/.local/state/nix/profile/lib`.
-
-## Serum 2
-
-Serum 2 uses `/usr/bin/zenity` or `/usr/bin/kdialog` for preset file dialogs. On NixOS, launch your DAW through `steam-run` so those FHS helper paths are available; otherwise preset directory selection may not work:
-
-```sh
-steam-run reaper
-```
 
 ## Overwitch Module
 

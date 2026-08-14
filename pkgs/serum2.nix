@@ -21,14 +21,15 @@
   libxkbcommon,
   openssl,
   pango,
+  zstd,
 }:
 stdenv.mkDerivation {
   pname = "serum2";
-  version = "2.1.5-beta";
+  version = "2.1.5-beta-2026-08-14";
 
   src = fetchurl {
-    url = "https://www.dropbox.com/scl/fi/vvpvhf5jkk1oxoek5bpss/Serum2_Linux_Beta_26-08-05_b287808.tar.gz?rlkey=se7uqxx4vjjujpnyt099q5pra&st=axyvbui6&dl=1";
-    hash = "sha256-mZg4EbzFs1UCwlmpgOb3DDMMUZCvoc2yggq8HT8p6QQ=";
+    url = "https://www.dropbox.com/scl/fi/a9hqum5hwrh8o9bw7eorb/Serum2_Linux_Beta_26-08-14_c0915e9_x86_64.tar.xz?rlkey=elw22urdvvv9nq7dsmk0bk2hc&st=m02t5l3m&dl=1";
+    hash = "sha256-UXH36QDdCrk1foGa7u6JQTP6GiYVqid5id3SKrYBVvk=";
   };
 
   dontBuild = true;
@@ -56,6 +57,7 @@ stdenv.mkDerivation {
     openssl
     pango
     stdenv.cc.cc.lib
+    zstd
   ];
 
   installPhase = ''
