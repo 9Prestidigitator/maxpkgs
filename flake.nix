@@ -11,7 +11,10 @@
 
     pulse-visualizer = {
       url = "github:Audio-Solutions/pulse-visualizer";
-      inputs.flake-parts.follows = "flake-parts";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-parts.follows = "flake-parts";
+      };
     };
   };
 
