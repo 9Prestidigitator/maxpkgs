@@ -194,6 +194,6 @@ in
       homepage = "https://github.com/Anjok07/ultimatevocalremovergui";
       license = lib.licenses.mit;
       mainProgram = "ultimate-vocal-remover-gui";
-      platforms = ["x86_64-linux"];
+      platforms = ["x86_64-linux" "aarch64-linux"];
     };
   }

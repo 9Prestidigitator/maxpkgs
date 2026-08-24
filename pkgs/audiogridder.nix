@@ -108,7 +108,7 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p "$out/bin" "$out/lib/vst3" "$out/share/applications" "$out/share/pixmaps"
 
     for plugin in AudioGridder AudioGridderInst AudioGridderMidi; do
-      install -Dm755 "lib/$plugin.so" "$out/lib/vst3/$plugin.vst3/Contents/x86_64-linux/$plugin.so"
+      install -Dm755 "lib/$plugin.so" "$out/lib/vst3/$plugin.vst3/Contents/${stdenv.hostPlatform.linuxArch}-linux/$plugin.so"
     done
 
     install -Dm755 bin/AudioGridderPluginTray "$out/bin/AudioGridderPluginTray"
@@ -126,7 +126,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Network bridge for audio plugins";
     homepage = "https://github.com/apohl79/audiogridder";
     license = lib.licenses.gpl3Only;
-    platforms = ["x86_64-linux"];
+    platforms = ["x86_64-linux" "aarch64-linux"];
     mainProgram = "AudioGridderServer";
   };
 })
