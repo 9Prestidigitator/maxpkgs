@@ -22,6 +22,18 @@
   wayland,
   writeShellScript,
   paidHash ? lib.fakeHash,
+  darwinDemoSrc ?
+    requireFile {
+      name = "minimeters-macos-demo";
+      hash = lib.fakeHash;
+      message = "Pass the extracted MiniMeters macOS demo payload as darwinDemoSrc.";
+    },
+  darwinPaidSrc ?
+    requireFile {
+      name = "minimeters-macos";
+      hash = lib.fakeHash;
+      message = "Pass the extracted MiniMeters macOS payload as darwinPaidSrc.";
+    },
 }: let
   version = "1.0.30";
   homepage = "https://minimeters.app/";
@@ -40,6 +52,12 @@
         demoHash = "sha256-tnnqfwusHq1IL5BC8fbhqzJOxLqeDT5Ev7Es9zDywCA=";
         paidFileName = "minimeters-linux-arm64.zip";
       };
+      aarch64-darwin = {
+        demoFileName = "minimeters-macos-demo";
+        demoUploadId = "";
+        demoHash = lib.fakeHash;
+        paidFileName = "minimeters-macos";
+      };
     }
     .${
       stdenv.hostPlatform.system
@@ -54,9 +72,10 @@
   platforms = [
     "x86_64-linux"
     "aarch64-linux"
+    "aarch64-darwin"
   ];
 
-  runtimeLibraries = [
+  runtimeLibraries = lib.optionals stdenv.hostPlatform.isLinux [
     libdecor
     libglvnd
     libX11
@@ -126,7 +145,7 @@
           "$url"
       '';
 
-      nativeBuildInputs = [
+      nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
         cacert
         curl
         jq
@@ -146,7 +165,7 @@
     stdenv.mkDerivation (finalAttrs: {
       inherit pname version src;
 
-      nativeBuildInputs = [
+      nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
         autoPatchelfHook
         copyDesktopItems
         makeWrapper
@@ -159,7 +178,7 @@
       dontBuild = true;
       dontStrip = true;
 
-      desktopItems = [
+      desktopItems = lib.optionals stdenv.hostPlatform.isLinux [
         (makeDesktopItem {
           name = finalAttrs.pname;
           exec = binaryName;
@@ -174,43 +193,74 @@
         })
       ];
 
-      unpackPhase = ''
+      unpackPhase = lib.optionalString stdenv.hostPlatform.isLinux ''
         unzip -q "$src"
       '';
 
-      installPhase = ''
-        runHook preInstall
+      installPhase =
+        if stdenv.hostPlatform.isDarwin
+        then ''
+          runHook preInstall
 
-        appimage="$(find . -maxdepth 1 -type f -name "MiniMeters*.AppImage" -print -quit)"
-        if [ -z "$appimage" ]; then
-          echo "Unable to find MiniMeters AppImage in archive" >&2
-          exit 1
-        fi
+          mkdir -p "$out/Applications" "$out/bin"
+          app=$(find "$src" -type d -name '*.app' -print -quit)
+          if test -z "$app"; then
+            echo "Unable to find a MiniMeters application bundle in $src" >&2
+            exit 1
+          fi
+          cp -R "$app" "$out/Applications/"
+          installedApp="$out/Applications/$(basename "$app")"
+          executable=$(find "$installedApp/Contents/MacOS" -type f -perm -0100 -print -quit)
+          ln -s "$executable" "$out/bin/${binaryName}"
 
-        chmod +x "$appimage"
-        "$appimage" --appimage-extract >/dev/null
+          for format in CLAP Components VST3; do
+            destination="$out/Library/Audio/Plug-Ins/$format"
+            mkdir -p "$destination"
+            case "$format" in
+              CLAP) pattern='*.clap' ;;
+              Components) pattern='*.component' ;;
+              VST3) pattern='*.vst3' ;;
+            esac
+            while IFS= read -r bundle; do
+              cp -R "$bundle" "$destination/"
+            done < <(find "$src" -type d -name "$pattern")
+          done
 
-        install -Dm755 squashfs-root/usr/bin/MiniMeters "$out/bin/${binaryName}"
-        install -Dm644 squashfs-root/MiniMeters.png "$out/share/icons/hicolor/256x256/apps/minimeters.png"
+          runHook postInstall
+        ''
+        else ''
+          runHook preInstall
 
-        wrapProgram "$out/bin/${binaryName}" \
-          --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath runtimeLibraries}"
+          appimage="$(find . -maxdepth 1 -type f -name "MiniMeters*.AppImage" -print -quit)"
+          if [ -z "$appimage" ]; then
+            echo "Unable to find MiniMeters AppImage in archive" >&2
+            exit 1
+          fi
 
-        if [ -d CLAP ]; then
-          while IFS= read -r -d "" plugin; do
-            install -Dm755 "$plugin" "$out/lib/clap/$(basename "$plugin")"
-          done < <(find CLAP -maxdepth 1 -type f -name "*.clap" -print0)
-        fi
+          chmod +x "$appimage"
+          "$appimage" --appimage-extract >/dev/null
 
-        if [ -d VST3 ]; then
-          mkdir -p "$out/lib/vst3"
-          while IFS= read -r -d "" bundle; do
-            cp -r "$bundle" "$out/lib/vst3/"
-          done < <(find VST3 -maxdepth 1 -type d -name "*.vst3" -print0)
-        fi
+          install -Dm755 squashfs-root/usr/bin/MiniMeters "$out/bin/${binaryName}"
+          install -Dm644 squashfs-root/MiniMeters.png "$out/share/icons/hicolor/256x256/apps/minimeters.png"
 
-        runHook postInstall
-      '';
+          wrapProgram "$out/bin/${binaryName}" \
+            --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath runtimeLibraries}"
+
+          if [ -d CLAP ]; then
+            while IFS= read -r -d "" plugin; do
+              install -Dm755 "$plugin" "$out/lib/clap/$(basename "$plugin")"
+            done < <(find CLAP -maxdepth 1 -type f -name "*.clap" -print0)
+          fi
+
+          if [ -d VST3 ]; then
+            mkdir -p "$out/lib/vst3"
+            while IFS= read -r -d "" bundle; do
+              cp -r "$bundle" "$out/lib/vst3/"
+            done < <(find VST3 -maxdepth 1 -type d -name "*.vst3" -print0)
+          fi
+
+          runHook postInstall
+        '';
 
       meta = {
         inherit description homepage platforms;
@@ -220,28 +270,36 @@
       };
     });
 
-  demoSrc = fetchItchUpload {
-    name = platformInfo.demoFileName;
-    uploadId = platformInfo.demoUploadId;
-    hash = platformInfo.demoHash;
-  };
+  demoSrc =
+    if stdenv.hostPlatform.isDarwin
+    then darwinDemoSrc
+    else
+      fetchItchUpload {
+        name = platformInfo.demoFileName;
+        uploadId = platformInfo.demoUploadId;
+        hash = platformInfo.demoHash;
+      };
 
-  paidSrc = requireFile rec {
-    name = platformInfo.paidFileName;
-    hash = paidHash;
-    message = ''
-      MiniMeters is a paid download distributed through itch.io.
+  paidSrc =
+    if stdenv.hostPlatform.isDarwin
+    then darwinPaidSrc
+    else
+      requireFile rec {
+        name = platformInfo.paidFileName;
+        hash = paidHash;
+        message = ''
+          MiniMeters is a paid download distributed through itch.io.
 
-      Purchase and download ${name} from:
-        https://directmusic.itch.io/minimeters
+          Purchase and download ${name} from:
+            https://directmusic.itch.io/minimeters
 
-      Then compute its hash:
-        nix hash file --type sha256 --sri /path/to/${name}
+          Then compute its hash:
+            nix hash file --type sha256 --sri /path/to/${name}
 
-      Override the paidHash package argument with that hash, then add the file to the Nix store:
-        nix-store --add-fixed sha256 /path/to/${name}
-    '';
-  };
+          Override the paidHash package argument with that hash, then add the file to the Nix store:
+            nix-store --add-fixed sha256 /path/to/${name}
+        '';
+      };
 in rec {
   demo = mkMiniMeters {
     pname = "minimeters-demo";

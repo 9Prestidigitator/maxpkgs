@@ -4,7 +4,10 @@
   fetchurl,
   requireFile,
   autoPatchelfHook,
+  cpio,
+  gzip,
   libX11,
+  p7zip,
   symlinkJoin,
   unzip,
   zlib,
@@ -34,12 +37,18 @@
 
         pname = "${attrName}-${name}";
 
-        nativeBuildInputs = [
-          autoPatchelfHook
-          unzip
-        ];
+        nativeBuildInputs =
+          [unzip]
+          ++ lib.optionals stdenv.hostPlatform.isLinux [
+            autoPatchelfHook
+          ]
+          ++ lib.optionals stdenv.hostPlatform.isDarwin [
+            cpio
+            gzip
+            p7zip
+          ];
 
-        buildInputs = [
+        buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
           libX11
           stdenv.cc.cc.lib
           zlib
@@ -52,43 +61,75 @@
           unzip -q "$src"
         '';
 
-        installPhase = ''
-          runHook preInstall
+        installPhase =
+          if stdenv.hostPlatform.isDarwin
+          then ''
+            runHook preInstall
 
-          cd ${archiveBase}-${archiveEdition}-${finalAttrs.version}
+            cd ${archiveBase}-${archiveEdition}-${finalAttrs.version}
+            package=$(find Mac -type f -name '*.pkg' -print -quit)
+            test -n "$package"
+            mkdir package payload
+            7z x -y -opackage "$package" >/dev/null
 
-          mkdir -p $out/lib/clap $out/lib/lv2 $out/lib/vst $out/lib/vst3 $out/share/doc/${finalAttrs.pname}
+            for archive in package/*-{au,clap,vst,vst3}.pkg/Payload; do
+              gzip -dc "$archive" | (cd payload && cpio -idm --quiet)
+            done
 
-          while IFS= read -r -d "" plugin; do
-            install -Dm755 "$plugin" "$out/lib/clap/$(basename "$plugin")"
-          done < <(find Linux -type f -name "*.clap" -print0)
+            mkdir -p \
+              "$out/Library/Audio/Plug-Ins/CLAP" \
+              "$out/Library/Audio/Plug-Ins/Components" \
+              "$out/Library/Audio/Plug-Ins/VST" \
+              "$out/Library/Audio/Plug-Ins/VST3" \
+              "$out/share/doc/${finalAttrs.pname}"
+            cp -R payload/*.clap "$out/Library/Audio/Plug-Ins/CLAP/"
+            cp -R payload/*.component "$out/Library/Audio/Plug-Ins/Components/"
+            cp -R payload/*.vst "$out/Library/Audio/Plug-Ins/VST/"
+            cp -R payload/*.vst3 "$out/Library/Audio/Plug-Ins/VST3/"
 
-          while IFS= read -r -d "" bundle; do
-            cp -r "$bundle" $out/lib/lv2/
-          done < <(find Linux -type d -name "*.lv2" -print0)
+            for doc in *.pdf *.jpg *.html; do
+              [ -e "$doc" ] || continue
+              install -m644 -t "$out/share/doc/${finalAttrs.pname}" "$doc"
+            done
 
-          while IFS= read -r -d "" plugin; do
-            install -Dm755 "$plugin" "$out/lib/vst/$(basename "$plugin")"
-          done < <(find Linux -type f -name "*.so" ! -path "*.lv2/*" ! -path "*.vst3/*" -print0)
+            runHook postInstall
+          ''
+          else ''
+            runHook preInstall
 
-          while IFS= read -r -d "" bundle; do
-            cp -r "$bundle" $out/lib/vst3/
-          done < <(find Linux -type d -name "*.vst3" -print0)
+            cd ${archiveBase}-${archiveEdition}-${finalAttrs.version}
 
-          for doc in *.pdf *.jpg *.html; do
-            [ -e "$doc" ] || continue
-            install -m644 -t $out/share/doc/${finalAttrs.pname} "$doc"
-          done
+            mkdir -p $out/lib/clap $out/lib/lv2 $out/lib/vst $out/lib/vst3 $out/share/doc/${finalAttrs.pname}
 
-          runHook postInstall
-        '';
+            while IFS= read -r -d "" plugin; do
+              install -Dm755 "$plugin" "$out/lib/clap/$(basename "$plugin")"
+            done < <(find Linux -type f -name "*.clap" -print0)
+
+            while IFS= read -r -d "" bundle; do
+              cp -r "$bundle" $out/lib/lv2/
+            done < <(find Linux -type d -name "*.lv2" -print0)
+
+            while IFS= read -r -d "" plugin; do
+              install -Dm755 "$plugin" "$out/lib/vst/$(basename "$plugin")"
+            done < <(find Linux -type f -name "*.so" ! -path "*.lv2/*" ! -path "*.vst3/*" -print0)
+
+            while IFS= read -r -d "" bundle; do
+              cp -r "$bundle" $out/lib/vst3/
+            done < <(find Linux -type d -name "*.vst3" -print0)
+
+            for doc in *.pdf *.jpg *.html; do
+              [ -e "$doc" ] || continue
+              install -m644 -t $out/share/doc/${finalAttrs.pname} "$doc"
+            done
+
+            runHook postInstall
+          '';
 
         meta = {
           description = "${descriptionEdition} edition of ${description}";
           inherit homepage;
           license = lib.licenses.unfree;
-          maintainers = with lib.maintainers; [polygon];
-          platforms = ["x86_64-linux"];
+          platforms = ["x86_64-linux" "aarch64-darwin"];
           sourceProvenance = [lib.sourceTypes.binaryNativeCode];
         };
       });
@@ -239,7 +280,7 @@
         inherit description;
         homepage = "https://www.auburnsounds.com/index.html";
         license = lib.licenses.unfree;
-        platforms = ["x86_64-linux"];
+        platforms = ["x86_64-linux" "aarch64-darwin"];
         sourceProvenance = [lib.sourceTypes.binaryNativeCode];
       };
     };

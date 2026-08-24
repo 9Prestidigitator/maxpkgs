@@ -34,7 +34,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
   ];
 
-  buildInputs = [
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     alsa-lib
     fontconfig
     freetype
@@ -51,7 +51,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   postPatch = ''
     substituteInPlace CMakeLists.txt \
-      --replace-fail "FORMATS AU VST3 Standalone LV2" "FORMATS VST3 Standalone LV2"
+      --replace-fail "FORMATS AU VST3 Standalone LV2" "FORMATS ${
+      if stdenv.hostPlatform.isDarwin
+      then "AU VST3 Standalone"
+      else "VST3 Standalone LV2"
+    }"
     substituteInPlace CMakeLists.txt \
       --replace-fail "COPY_PLUGIN_AFTER_BUILD TRUE" "COPY_PLUGIN_AFTER_BUILD FALSE"
     substituteInPlace CMakeLists.txt \
@@ -69,22 +73,40 @@ stdenv.mkDerivation (finalAttrs: {
     export HOME=$TMPDIR
   '';
 
-  installPhase = ''
-    runHook preInstall
+  installPhase =
+    if stdenv.hostPlatform.isDarwin
+    then ''
+      runHook preInstall
 
-    mkdir -p $out/bin $out/lib/lv2 $out/lib/vst3
-    cp -r Spice_artefacts/Release/LV2/*.lv2 $out/lib/lv2/
-    cp -r Spice_artefacts/Release/VST3/*.vst3 $out/lib/vst3/
-    install -Dm755 Spice_artefacts/Release/Standalone/* $out/bin/spice-oss
+      artefacts=Spice_artefacts/Release
+      mkdir -p \
+        "$out/Applications" \
+        "$out/bin" \
+        "$out/Library/Audio/Plug-Ins/Components" \
+        "$out/Library/Audio/Plug-Ins/VST3"
+      cp -R "$artefacts"/Standalone/*.app "$out/Applications/"
+      cp -R "$artefacts"/AU/*.component "$out/Library/Audio/Plug-Ins/Components/"
+      cp -R "$artefacts"/VST3/*.vst3 "$out/Library/Audio/Plug-Ins/VST3/"
+      ln -s '../Applications/Spice FX.app/Contents/MacOS/Spice FX' "$out/bin/spice-oss"
 
-    runHook postInstall
-  '';
+      runHook postInstall
+    ''
+    else ''
+      runHook preInstall
+
+      mkdir -p $out/bin $out/lib/lv2 $out/lib/vst3
+      cp -r Spice_artefacts/Release/LV2/*.lv2 $out/lib/lv2/
+      cp -r Spice_artefacts/Release/VST3/*.vst3 $out/lib/vst3/
+      install -Dm755 Spice_artefacts/Release/Standalone/* $out/bin/spice-oss
+
+      runHook postInstall
+    '';
 
   meta = {
     description = "Analog modeling saturation plugin with cabinet simulation";
     homepage = "https://github.com/DatanoiseTV/spice-oss";
     license = lib.licenses.bsd3;
-    platforms = lib.platforms.linux;
+    platforms = lib.platforms.linux ++ ["aarch64-darwin"];
     mainProgram = "spice-oss";
   };
 })

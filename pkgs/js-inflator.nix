@@ -48,7 +48,7 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
   ];
 
-  buildInputs = [
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     cairo
     expat
     fontconfig
@@ -82,29 +82,40 @@ stdenv.mkDerivation (finalAttrs: {
     cmakeFlagsArray+=("-DSMTG_PLUGIN_TARGET_USER_PATH=$PWD/build/VST3")
   '';
 
-  cmakeFlags = [
-    "-DCMAKE_CXX_FLAGS=-fpermissive -Wno-changes-meaning"
-    "-DSMTG_CREATE_PLUGIN_LINK=OFF"
-    "-DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF"
-    "-DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=OFF"
-    "-DSMTG_ENABLE_VSTGUI_SUPPORT=ON"
-    "-DSMTG_MDA_VST3_VST2_COMPATIBLE=OFF"
-  ];
+  cmakeFlags =
+    lib.optional stdenv.hostPlatform.isLinux "-DCMAKE_CXX_FLAGS=-fpermissive -Wno-changes-meaning"
+    ++ [
+      "-DSMTG_CREATE_PLUGIN_LINK=OFF"
+      "-DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF"
+      "-DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=OFF"
+      "-DSMTG_ENABLE_VSTGUI_SUPPORT=ON"
+      "-DSMTG_MDA_VST3_VST2_COMPATIBLE=OFF"
+    ];
 
-  installPhase = ''
-    runHook preInstall
+  installPhase =
+    if stdenv.hostPlatform.isDarwin
+    then ''
+      runHook preInstall
 
-    mkdir -p $out/lib/vst3
-    cp -r VST3/Release/JS_Inflator.vst3 $out/lib/vst3/
+      mkdir -p "$out/Library/Audio/Plug-Ins/VST3"
+      cp -R VST3/Release/JS_Inflator.vst3 "$out/Library/Audio/Plug-Ins/VST3/"
 
-    runHook postInstall
-  '';
+      runHook postInstall
+    ''
+    else ''
+      runHook preInstall
+
+      mkdir -p $out/lib/vst3
+      cp -r VST3/Release/JS_Inflator.vst3 $out/lib/vst3/
+
+      runHook postInstall
+    '';
 
   meta = {
     description = "Open source VST3 inflator audio effect plugin";
     homepage = "https://github.com/Kiriki-liszt/JS_Inflator";
     license = lib.licenses.gpl3Only;
-    maintainers = with lib.maintainers; [9prestidigitator];
-    platforms = lib.platforms.linux;
+    maintainers = with lib.maintainers; [9 prestidigitator];
+    platforms = lib.platforms.linux ++ ["aarch64-darwin"];
   };
 })

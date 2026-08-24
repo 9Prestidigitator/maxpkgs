@@ -51,7 +51,7 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
   ];
 
-  buildInputs = [
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     alsa-lib
     at-spi2-core
     curl
@@ -83,7 +83,7 @@ stdenv.mkDerivation (finalAttrs: {
     sqlite
   ];
 
-  cmakeFlags = [
+  cmakeFlags = lib.optionals stdenv.hostPlatform.isLinux [
     "-DCMAKE_AR=${stdenv.cc.cc}/bin/gcc-ar"
     "-DCMAKE_RANLIB=${stdenv.cc.cc}/bin/gcc-ranlib"
     "-DCMAKE_NM=${stdenv.cc.cc}/bin/gcc-nm"
@@ -100,33 +100,53 @@ stdenv.mkDerivation (finalAttrs: {
       'cmake_minimum_required(VERSION 4.0)'
   '';
 
-  installPhase = ''
-    runHook preInstall
+  installPhase =
+    if stdenv.hostPlatform.isDarwin
+    then ''
+      runHook preInstall
 
-    mkdir -p $out/lib/lv2 $out/lib/vst3 $out/lib/clap $out/bin $out/share/doc/CHOWTapeModel
-    cd CHOWTapeModel_artefacts/${finalAttrs.cmakeBuildType}
-    cp -r LV2/CHOWTapeModel.lv2 $out/lib/lv2
-    cp -r VST3/CHOWTapeModel.vst3 $out/lib/vst3
-    cp -r CLAP/CHOWTapeModel.clap $out/lib/clap
-    cp Standalone/CHOWTapeModel $out/bin
-    cp ../../../../Manual/ChowTapeManual.pdf $out/share/doc/CHOWTapeModel/
+      artefacts=CHOWTapeModel_artefacts/${finalAttrs.cmakeBuildType}
+      mkdir -p \
+        "$out/Applications" \
+        "$out/Library/Audio/Plug-Ins/CLAP" \
+        "$out/Library/Audio/Plug-Ins/Components" \
+        "$out/Library/Audio/Plug-Ins/VST3" \
+        "$out/share/doc/CHOWTapeModel"
+      cp -R "$artefacts/Standalone/CHOWTapeModel.app" "$out/Applications/"
+      cp -R "$artefacts/AU/CHOWTapeModel.component" "$out/Library/Audio/Plug-Ins/Components/"
+      cp -R "$artefacts/VST3/CHOWTapeModel.vst3" "$out/Library/Audio/Plug-Ins/VST3/"
+      cp -R "$artefacts/CLAP/CHOWTapeModel.clap" "$out/Library/Audio/Plug-Ins/CLAP/"
+      cp ../Manual/ChowTapeManual.pdf "$out/share/doc/CHOWTapeModel/"
 
-    runHook postInstall
-  '';
+      runHook postInstall
+    ''
+    else ''
+      runHook preInstall
 
-  env.NIX_LDFLAGS = toString [
+      mkdir -p $out/lib/lv2 $out/lib/vst3 $out/lib/clap $out/bin $out/share/doc/CHOWTapeModel
+      cd CHOWTapeModel_artefacts/${finalAttrs.cmakeBuildType}
+      cp -r LV2/CHOWTapeModel.lv2 $out/lib/lv2
+      cp -r VST3/CHOWTapeModel.vst3 $out/lib/vst3
+      cp -r CLAP/CHOWTapeModel.clap $out/lib/clap
+      cp Standalone/CHOWTapeModel $out/bin
+      cp ../../../../Manual/ChowTapeManual.pdf $out/share/doc/CHOWTapeModel/
+
+      runHook postInstall
+    '';
+
+  env.NIX_LDFLAGS = lib.optionalString stdenv.hostPlatform.isLinux (toString [
     "-lX11"
     "-lXext"
     "-lXcursor"
     "-lXinerama"
     "-lXrandr"
-  ];
+  ]);
 
   meta = {
     homepage = "https://github.com/jatinchowdhury18/AnalogTapeModel";
     description = "Physical modelling signal processing for analog tape recording";
     license = with lib.licenses; [gpl3Only];
-    platforms = ["x86_64-linux" "aarch64-linux"];
+    platforms = ["x86_64-linux" "aarch64-linux" "aarch64-darwin"];
     mainProgram = "CHOWTapeModel";
   };
 })

@@ -29,6 +29,7 @@
   pango,
   pipewire,
   stdenv,
+  undmg,
   vulkan-loader,
   wrapGAppsHook3,
   writeShellScript,
@@ -42,22 +43,39 @@ in {
   pname = "bitwig-studio6";
   version = "6.1-beta7";
 
-  src = fetchurl {
-    name = "bitwig-studio-${finalAttrs.version}.deb";
-    url = "https://www.bitwig.com/dl/Bitwig%20Studio/${urlVersion}/installer_linux/";
-    hash = "sha256-9xd+eR49v/a9mcaac2Qe96eRRYV/BKRUPdG0dPzCOHc=";
-  };
+  src = fetchurl (
+    if stdenv.hostPlatform.isDarwin
+    then {
+      name = "bitwig-studio-${finalAttrs.version}.dmg";
+      url = "https://www.bitwig.com/dl/Bitwig%20Studio/${urlVersion}/installer_mac/";
+      hash = "sha256-iKUIWRv0e4y8mWAM7zTTlY0pcM/v0bbmW6gmibuREFY=";
+    }
+    else {
+      name = "bitwig-studio-${finalAttrs.version}.deb";
+      url = "https://www.bitwig.com/dl/Bitwig%20Studio/${urlVersion}/installer_linux/";
+      hash = "sha256-9xd+eR49v/a9mcaac2Qe96eRRYV/BKRUPdG0dPzCOHc=";
+    }
+  );
 
   strictDeps = true;
 
-  nativeBuildInputs = [
-    autoPatchelfHook
-    dpkg
-    makeBinaryWrapper
-    wrapGAppsHook3
-  ];
+  sourceRoot =
+    if stdenv.hostPlatform.isDarwin
+    then "."
+    else "root";
 
-  buildInputs = [
+  nativeBuildInputs =
+    lib.optionals stdenv.hostPlatform.isLinux [
+      autoPatchelfHook
+      dpkg
+      makeBinaryWrapper
+      wrapGAppsHook3
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      undmg
+    ];
+
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     atk
     cairo
     freetype
@@ -89,21 +107,32 @@ in {
 
   dontWrapGApps = true; # we only want $gappsWrapperArgs here
 
-  installPhase = ''
-    runHook preInstall
+  installPhase =
+    if stdenv.hostPlatform.isDarwin
+    then ''
+      runHook preInstall
 
-    mkdir "$out"
-    cp -r usr/share "$out"
-    cp -r opt/bitwig-studio "$out"/libexec
+      mkdir -p "$out/Applications" "$out/bin"
+      cp -R "Bitwig Studio.app" "$out/Applications/"
+      ln -s "$out/Applications/Bitwig Studio.app/Contents/MacOS/BitwigStudio" "$out/bin/bitwig-studio"
 
-    # Bitwig includes a copy of libxcb-imdkit.
-    # Removing it will force it to use our version.
-    rm "$out"/libexec/lib/bitwig-studio/libxcb-imdkit.so.1
+      runHook postInstall
+    ''
+    else ''
+      runHook preInstall
 
-    runHook postInstall
-  '';
+      mkdir "$out"
+      cp -r usr/share "$out"
+      cp -r opt/bitwig-studio "$out"/libexec
 
-  postFixup = let
+      # Bitwig includes a copy of libxcb-imdkit.
+      # Removing it will force it to use our version.
+      rm "$out"/libexec/lib/bitwig-studio/libxcb-imdkit.so.1
+
+      runHook postInstall
+    '';
+
+  postFixup = lib.optionalString stdenv.hostPlatform.isLinux (let
     wrapper = writeShellScript "bitwig-studio" ''
       set -e
 
@@ -133,7 +162,7 @@ in {
     install -D ${wrapper} "$out"/bin/bitwig-studio
     wrapProgram "$out"/bin/bitwig-studio \
       --prefix PATH : ${lib.makeBinPath [bubblewrap]}
-  '';
+  '');
 
   meta = {
     description = "Digital audio workstation";
@@ -144,7 +173,7 @@ in {
     '';
     homepage = "https://www.bitwig.com/";
     license = lib.licenses.unfree;
-    platforms = ["x86_64-linux"];
+    platforms = ["x86_64-linux" "aarch64-darwin"];
     maintainers = with lib.maintainers; [
       bfortz
       eleina

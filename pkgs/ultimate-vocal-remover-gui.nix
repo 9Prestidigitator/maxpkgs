@@ -1,6 +1,7 @@
 {
   lib,
   stdenv,
+  coreutils,
   fetchFromGitHub,
   fetchPypi,
   makeWrapper,
@@ -164,7 +165,7 @@ in
 
       makeWrapper ${pythonEnv}/bin/python "$out/bin/ultimate-vocal-remover-gui" \
         --add-flags "\"\$UVR_DATA_HOME/UVR.py\"" \
-        --prefix PATH : ${lib.makeBinPath [ffmpeg rubberband]} \
+        --prefix PATH : ${lib.makeBinPath [coreutils ffmpeg rubberband]} \
         --set TK_LIBRARY "${tk}/lib/${tk.libPrefix}" \
         --run 'export UVR_DATA_HOME="''${XDG_DATA_HOME:-$HOME/.local/share}/ultimate-vocal-remover-gui"' \
         --run 'mkdir -p "$UVR_DATA_HOME"' \
@@ -194,6 +195,6 @@ in
       homepage = "https://github.com/Anjok07/ultimatevocalremovergui";
       license = lib.licenses.mit;
       mainProgram = "ultimate-vocal-remover-gui";
-      platforms = ["x86_64-linux" "aarch64-linux"];
+      platforms = ["x86_64-linux" "aarch64-linux" "aarch64-darwin"];
     };
   }

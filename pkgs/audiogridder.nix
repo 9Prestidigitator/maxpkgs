@@ -45,31 +45,34 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
   ];
 
-  buildInputs = [
-    alsa-lib
-    boost
-    ffmpeg_6
-    fontconfig
-    freetype
-    libGL
-    libX11
-    libXcursor
-    libXext
-    libXinerama
-    libXi
-    libXrandr
-    libXtst
-    libjack2
-    libwebp
-    libxcb
-    libxcb-cursor
-    libxcb-errors
-    libxcb-image
-    libxcb-keysyms
-    libxcb-render-util
-    libxcb-util
-    libxcb-wm
-  ];
+  buildInputs =
+    [
+      boost
+      ffmpeg_6
+      libwebp
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      alsa-lib
+      fontconfig
+      freetype
+      libGL
+      libX11
+      libXcursor
+      libXext
+      libXinerama
+      libXi
+      libXrandr
+      libXtst
+      libjack2
+      libxcb
+      libxcb-cursor
+      libxcb-errors
+      libxcb-image
+      libxcb-keysyms
+      libxcb-render-util
+      libxcb-util
+      libxcb-wm
+    ];
 
   postPatch = ''
       substituteInPlace CMakeLists.txt \
@@ -102,31 +105,51 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeBuildType = "RelWithDebInfo";
 
-  installPhase = ''
-    runHook preInstall
+  installPhase =
+    if stdenv.hostPlatform.isDarwin
+    then ''
+      runHook preInstall
 
-    mkdir -p "$out/bin" "$out/lib/vst3" "$out/share/applications" "$out/share/pixmaps"
+      mkdir -p \
+        "$out/Applications" \
+        "$out/bin" \
+        "$out/Library/Audio/Plug-Ins/Components" \
+        "$out/Library/Audio/Plug-Ins/VST3"
+      cp -R bin/AudioGridderPluginTray.app bin/AudioGridderServer.app "$out/Applications/"
+      cp -R lib/*.component "$out/Library/Audio/Plug-Ins/Components/"
+      cp -R lib/*.vst3 "$out/Library/Audio/Plug-Ins/VST3/"
+      ln -s ../Applications/AudioGridderServer.app/Contents/MacOS/AudioGridderServer \
+        "$out/bin/AudioGridderServer"
+      ln -s ../Applications/AudioGridderPluginTray.app/Contents/MacOS/AudioGridderPluginTray \
+        "$out/bin/AudioGridderPluginTray"
 
-    for plugin in AudioGridder AudioGridderInst AudioGridderMidi; do
-      install -Dm755 "lib/$plugin.so" "$out/lib/vst3/$plugin.vst3/Contents/${stdenv.hostPlatform.linuxArch}-linux/$plugin.so"
-    done
+      runHook postInstall
+    ''
+    else ''
+      runHook preInstall
 
-    install -Dm755 bin/AudioGridderPluginTray "$out/bin/AudioGridderPluginTray"
-    install -Dm755 bin/AudioGridderServer "$out/bin/AudioGridderServer"
-    install -Dm644 ../package/audiogridderserver.desktop "$out/share/applications/audiogridderserver.desktop"
-    install -Dm644 ../Server/Resources/icon.png "$out/share/pixmaps/audiogridderserver.png"
-    substituteInPlace "$out/share/applications/audiogridderserver.desktop" \
-      --replace-fail "Exec=/usr/local/bin/AudioGridderServer" "Exec=$out/bin/AudioGridderServer" \
-      --replace-fail "Icon=/usr/local/share/audiogridder/icon64.png" "Icon=audiogridderserver"
+      mkdir -p "$out/bin" "$out/lib/vst3" "$out/share/applications" "$out/share/pixmaps"
 
-    runHook postInstall
-  '';
+      for plugin in AudioGridder AudioGridderInst AudioGridderMidi; do
+        install -Dm755 "lib/$plugin.so" "$out/lib/vst3/$plugin.vst3/Contents/${stdenv.hostPlatform.linuxArch}-linux/$plugin.so"
+      done
+
+      install -Dm755 bin/AudioGridderPluginTray "$out/bin/AudioGridderPluginTray"
+      install -Dm755 bin/AudioGridderServer "$out/bin/AudioGridderServer"
+      install -Dm644 ../package/audiogridderserver.desktop "$out/share/applications/audiogridderserver.desktop"
+      install -Dm644 ../Server/Resources/icon.png "$out/share/pixmaps/audiogridderserver.png"
+      substituteInPlace "$out/share/applications/audiogridderserver.desktop" \
+        --replace-fail "Exec=/usr/local/bin/AudioGridderServer" "Exec=$out/bin/AudioGridderServer" \
+        --replace-fail "Icon=/usr/local/share/audiogridder/icon64.png" "Icon=audiogridderserver"
+
+      runHook postInstall
+    '';
 
   meta = {
     description = "Network bridge for audio plugins";
     homepage = "https://github.com/apohl79/audiogridder";
     license = lib.licenses.gpl3Only;
-    platforms = ["x86_64-linux" "aarch64-linux"];
+    platforms = ["x86_64-linux" "aarch64-linux" "aarch64-darwin"];
     mainProgram = "AudioGridderServer";
   };
 })

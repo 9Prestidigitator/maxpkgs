@@ -13,8 +13,10 @@
   makeDesktopItem,
   makeWrapper,
   p7zip,
+  requireFile,
   writeShellScript,
   hashes ? {},
+  darwinSources ? {},
 }: let
   versionForFile = v: builtins.replaceStrings ["."] [""] v;
 
@@ -31,6 +33,15 @@
     ]
     else throw "unsupported platform";
 
+  darwinSourceFor = name: version:
+    darwinSources.${
+      name
+    } or (requireFile {
+      name = "pianoteq-${name}-${version}-macos";
+      hash = lib.fakeHash;
+      message = "Pass the extracted Pianoteq macOS payload as darwinSources.${name}.";
+    });
+
   mkPianoteq = {
     name,
     mainProgram,
@@ -44,28 +55,28 @@
 
       pname = "pianoteq-${name}";
 
-      unpackPhase = ''
+      unpackPhase = lib.optionalString stdenv.hostPlatform.isLinux ''
         case "$src" in
           *.tar.xz) unpackFile "$src" ;;
           *) ${p7zip}/bin/7z x "$src" ;;
         esac
       '';
 
-      nativeBuildInputs = [
+      nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
         autoPatchelfHook
         copyDesktopItems
         makeWrapper
         librsvg
       ];
 
-      buildInputs = [
+      buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
         (lib.getLib stdenv.cc.cc) # libgcc_s.so.1, libstdc++.so.6
         alsa-lib # libasound.so.2
         freetype # libfreetype.so.6
         libglvnd # libGL.so.1
       ];
 
-      desktopItems = [
+      desktopItems = lib.optionals stdenv.hostPlatform.isLinux [
         (makeDesktopItem {
           name = finalAttrs.pname;
           exec = ''"${mainProgram}"'';
@@ -82,35 +93,64 @@
         })
       ];
 
-      installPhase = ''
-        runHook preInstall
-        mkdir -p $out/bin $out/lib/lv2 $out/lib/vst3
+      installPhase =
+        if stdenv.hostPlatform.isDarwin
+        then ''
+          runHook preInstall
 
-        for archdir in ${builtins.concatStringsSep " " archdirs}; do
-          for path in Pianoteq*/"$archdir"/*; do
-            [ -e "$path" ] || continue
+          mkdir -p \
+            "$out/Applications" \
+            "$out/bin" \
+            "$out/Library/Audio/Plug-Ins/Components" \
+            "$out/Library/Audio/Plug-Ins/VST3"
+          app=$(find "$src" -type d -name '*.app' -print -quit)
+          if test -z "$app"; then
+            echo "Unable to find a Pianoteq application bundle in $src" >&2
+            exit 1
+          fi
+          cp -R "$app" "$out/Applications/"
+          installedApp="$out/Applications/$(basename "$app")"
+          executable=$(find "$installedApp/Contents/MacOS" -type f -perm -0100 -print -quit)
+          ln -s "$executable" "$out/bin/${mainProgram}"
 
-            case "$path" in
-              *.lv2) mv "$path" $out/lib/lv2/ ;;
-              *.vst3) mv "$path" $out/lib/vst3/ ;;
-              *) mv "$path" $out/bin/ ;;
-            esac
+          while IFS= read -r bundle; do
+            cp -R "$bundle" "$out/Library/Audio/Plug-Ins/Components/"
+          done < <(find "$src" -type d -name '*.component')
+          while IFS= read -r bundle; do
+            cp -R "$bundle" "$out/Library/Audio/Plug-Ins/VST3/"
+          done < <(find "$src" -type d -name '*.vst3')
+
+          runHook postInstall
+        ''
+        else ''
+          runHook preInstall
+          mkdir -p $out/bin $out/lib/lv2 $out/lib/vst3
+
+          for archdir in ${builtins.concatStringsSep " " archdirs}; do
+            for path in Pianoteq*/"$archdir"/*; do
+              [ -e "$path" ] || continue
+
+              case "$path" in
+                *.lv2) mv "$path" $out/lib/lv2/ ;;
+                *.vst3) mv "$path" $out/lib/vst3/ ;;
+                *) mv "$path" $out/bin/ ;;
+              esac
+            done
           done
-        done
 
-        install -Dm644 ${../assets/pianoteq.svg} $out/share/icons/hicolor/scalable/apps/pianoteq.svg
-        for size in 16 22 32 48 64 128 256; do
-          dir=$out/share/icons/hicolor/"$size"x"$size"/apps
-          mkdir -p $dir
-          rsvg-convert \
-            --keep-aspect-ratio \
-            --width $size \
-            --height $size \
-            --output $dir/pianoteq.png \
-            ${../assets/pianoteq.svg}
-        done
-        runHook postInstall
-      '';
+          install -Dm644 ${../assets/pianoteq.svg} $out/share/icons/hicolor/scalable/apps/pianoteq.svg
+          for size in 16 22 32 48 64 128 256; do
+            dir=$out/share/icons/hicolor/"$size"x"$size"/apps
+            mkdir -p $dir
+            rsvg-convert \
+              --keep-aspect-ratio \
+              --width $size \
+              --height $size \
+              --output $dir/pianoteq.png \
+              ${../assets/pianoteq.svg}
+          done
+          runHook postInstall
+        '';
 
       meta = {
         homepage = "https://www.modartt.com/pianoteq";
@@ -120,6 +160,7 @@
         platforms = [
           "x86_64-linux"
           "aarch64-linux"
+          "aarch64-darwin"
         ];
         maintainers = with lib.maintainers; [
           mausch
@@ -272,10 +313,14 @@
       mainProgram = "Pianoteq ${lib.versions.major version}";
       startupWMClass = "Pianoteq";
       inherit version;
-      src = fetchPianoteqWithLogin {
-        name = "pianoteq_linux_v${versionForFile version}.7z";
-        inherit hash;
-      };
+      src =
+        if stdenv.hostPlatform.isDarwin
+        then darwinSourceFor "standard" version
+        else
+          fetchPianoteqWithLogin {
+            name = "pianoteq_linux_v${versionForFile version}.7z";
+            inherit hash;
+          };
     };
   mkStage = version: hash:
     mkPianoteq {
@@ -283,10 +328,14 @@
       mainProgram = "Pianoteq ${lib.versions.major version} STAGE";
       startupWMClass = "Pianoteq STAGE";
       inherit version;
-      src = fetchPianoteqWithLogin {
-        name = "pianoteq_stage_linux_v${versionForFile version}.7z";
-        inherit hash;
-      };
+      src =
+        if stdenv.hostPlatform.isDarwin
+        then darwinSourceFor "stage" version
+        else
+          fetchPianoteqWithLogin {
+            name = "pianoteq_stage_linux_v${versionForFile version}.7z";
+            inherit hash;
+          };
     };
   mkStandardTrial = version: hash:
     mkPianoteq {
@@ -294,10 +343,14 @@
       mainProgram = "Pianoteq ${lib.versions.major version}";
       startupWMClass = "Pianoteq Trial";
       inherit version;
-      src = fetchPianoteqTrial {
-        name = "pianoteq_trial_v${versionForFile version}.tar.xz";
-        inherit hash;
-      };
+      src =
+        if stdenv.hostPlatform.isDarwin
+        then darwinSourceFor "standard-trial" version
+        else
+          fetchPianoteqTrial {
+            name = "pianoteq_trial_v${versionForFile version}.tar.xz";
+            inherit hash;
+          };
     };
   mkStageTrial = version: hash:
     mkPianoteq {
@@ -305,10 +358,14 @@
       mainProgram = "Pianoteq ${lib.versions.major version} STAGE";
       startupWMClass = "Pianoteq STAGE Trial";
       inherit version;
-      src = fetchPianoteqTrial {
-        name = "pianoteq_stage_trial_v${versionForFile version}.tar.xz";
-        inherit hash;
-      };
+      src =
+        if stdenv.hostPlatform.isDarwin
+        then darwinSourceFor "stage-trial" version
+        else
+          fetchPianoteqTrial {
+            name = "pianoteq_stage_trial_v${versionForFile version}.tar.xz";
+            inherit hash;
+          };
     };
 in rec {
   standard_9 = mkStandard version9 (hashes.standard_9 or lib.fakeHash);

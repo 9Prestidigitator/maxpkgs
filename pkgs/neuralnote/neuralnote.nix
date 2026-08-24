@@ -34,30 +34,38 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
   ];
 
-  buildInputs = [
-    alsa-lib
-    fftwFloat
-    fontconfig
-    freetype
-    libGL
-    libjack2
-    libX11
-    libXcursor
-    libXext
-    libXinerama
-    libXrandr
-    onnxruntime
-  ];
+  buildInputs =
+    [
+      fftwFloat
+      onnxruntime
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      alsa-lib
+      fontconfig
+      freetype
+      libGL
+      libjack2
+      libX11
+      libXcursor
+      libXext
+      libXinerama
+      libXrandr
+    ];
 
   postPatch = ''
     substituteInPlace ThirdParty/RTNeural/CMakeLists.txt \
       --replace-fail 'include(cmake/CPM.cmake)' '# CPM is only needed for tests'
 
     substituteInPlace CMakeLists.txt \
-      --replace-fail 'add_library(onnxruntime STATIC IMPORTED)' 'add_library(onnxruntime SHARED IMPORTED)'
+      --replace-fail 'add_library(onnxruntime STATIC IMPORTED)' 'add_library(onnxruntime SHARED IMPORTED)' \
+      --replace-fail 'set(COPY_PLUGIN_AFTER_BUILD TRUE)' 'set(COPY_PLUGIN_AFTER_BUILD FALSE)'
 
     mkdir -p ThirdParty/onnxruntime/lib
-    ln -s ${lib.getLib onnxruntime}/lib/libonnxruntime.so \
+    ln -s ${lib.getLib onnxruntime}/lib/libonnxruntime.${
+      if stdenv.hostPlatform.isDarwin
+      then "dylib"
+      else "so"
+    } \
       ThirdParty/onnxruntime/lib/libonnxruntime.a
     ln -s ${lib.getDev onnxruntime}/include \
       ThirdParty/onnxruntime/include
@@ -66,7 +74,7 @@ stdenv.mkDerivation (finalAttrs: {
       Lib/ModelData/features_model.ort
   '';
 
-  cmakeFlags = [
+  cmakeFlags = lib.optionals stdenv.hostPlatform.isLinux [
     "-DCMAKE_AR=${stdenv.cc.cc}/bin/gcc-ar"
     "-DCMAKE_RANLIB=${stdenv.cc.cc}/bin/gcc-ranlib"
     "-DCMAKE_NM=${stdenv.cc.cc}/bin/gcc-nm"
@@ -74,17 +82,33 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeBuildType = "Release";
 
-  installPhase = ''
-    runHook preInstall
+  installPhase =
+    if stdenv.hostPlatform.isDarwin
+    then ''
+      runHook preInstall
 
-    mkdir -p "$out/bin" "$out/lib/vst3"
-    cp -R NeuralNote_artefacts/Release/VST3/. "$out/lib/vst3/"
-    cp -R NeuralNote_artefacts/Release/Standalone/. "$out/bin/"
+      artefacts=NeuralNote_artefacts/Release
+      mkdir -p \
+        "$out/Applications" \
+        "$out/Library/Audio/Plug-Ins/Components" \
+        "$out/Library/Audio/Plug-Ins/VST3"
+      cp -R "$artefacts/Standalone/NeuralNote.app" "$out/Applications/"
+      cp -R "$artefacts/AU/NeuralNote.component" "$out/Library/Audio/Plug-Ins/Components/"
+      cp -R "$artefacts/VST3/NeuralNote.vst3" "$out/Library/Audio/Plug-Ins/VST3/"
 
-    runHook postInstall
-  '';
+      runHook postInstall
+    ''
+    else ''
+      runHook preInstall
 
-  env.NIX_LDFLAGS = toString [
+      mkdir -p "$out/bin" "$out/lib/vst3"
+      cp -R NeuralNote_artefacts/Release/VST3/. "$out/lib/vst3/"
+      cp -R NeuralNote_artefacts/Release/Standalone/. "$out/bin/"
+
+      runHook postInstall
+    '';
+
+  env.NIX_LDFLAGS = lib.optionalString stdenv.hostPlatform.isLinux (toString [
     "-rpath"
     "${lib.getLib onnxruntime}/lib"
     "-lX11"
@@ -92,16 +116,17 @@ stdenv.mkDerivation (finalAttrs: {
     "-lXcursor"
     "-lXinerama"
     "-lXrandr"
-  ];
+  ]);
 
-  env.LD_LIBRARY_PATH = lib.makeLibraryPath [onnxruntime];
+  env.LD_LIBRARY_PATH = lib.optionalString stdenv.hostPlatform.isLinux (lib.makeLibraryPath [onnxruntime]);
+  env.DYLD_LIBRARY_PATH = lib.optionalString stdenv.hostPlatform.isDarwin (lib.makeLibraryPath [onnxruntime]);
 
   meta = {
     description = "Audio plug-in for automatic music transcription";
     homepage = "https://github.com/DamRsn/NeuralNote";
     license = lib.licenses.asl20;
     maintainers = with lib.maintainers; [polygon];
-    platforms = ["x86_64-linux" "aarch64-linux"];
+    platforms = ["x86_64-linux" "aarch64-linux" "aarch64-darwin"];
     mainProgram = "NeuralNote";
   };
 })
