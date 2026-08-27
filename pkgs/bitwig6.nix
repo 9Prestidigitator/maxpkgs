@@ -37,23 +37,23 @@
   zlib,
 }:
 stdenv.mkDerivation (finalAttrs: let
-  bitwigVersion = "6.1 Beta 7";
+  bitwigVersion = "6.1";
   urlVersion = lib.replaceStrings [" "] ["%20"] bitwigVersion;
 in {
   pname = "bitwig-studio6";
-  version = "6.1-beta7";
+  version = "6.1";
 
   src = fetchurl (
     if stdenv.hostPlatform.isDarwin
     then {
       name = "bitwig-studio-${finalAttrs.version}.dmg";
       url = "https://www.bitwig.com/dl/Bitwig%20Studio/${urlVersion}/installer_mac/";
-      hash = "sha256-iKUIWRv0e4y8mWAM7zTTlY0pcM/v0bbmW6gmibuREFY=";
+      hash = "sha256-EXgRdjNdqtuczEnuuHFisiQDIjiop2GIdT256OLxucI=";
     }
     else {
       name = "bitwig-studio-${finalAttrs.version}.deb";
       url = "https://www.bitwig.com/dl/Bitwig%20Studio/${urlVersion}/installer_linux/";
-      hash = "sha256-9xd+eR49v/a9mcaac2Qe96eRRYV/BKRUPdG0dPzCOHc=";
+      hash = "sha256-dJbwn8JNHuSZ/lKQV4zoSbbthDdHl4J7hhmOZ5AdA2M=";
     }
   );
 
