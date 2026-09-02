@@ -26,17 +26,18 @@
   pcre2,
   pkg-config,
   stdenv,
+  util-linux,
   webkitgtk_4_1,
 }:
 stdenv.mkDerivation (finalAttrs: {
-  pname = "tone-3000-plugin";
-  version = "0.0.3-unstable-2026-09-02";
+  pname = "tone3000-plugin";
+  version = "0.0.3";
 
   src = fetchFromGitHub {
     owner = "tone-3000";
     repo = "tone3000-plugin";
-    rev = "83ca7aadb3776be188dc8a3e758c78e133451591";
-    hash = "sha256-NaADGMB5oixqY3chTAcDpmM1gMC2mOYDw3hU1BcxiD4=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-+em9x0B4/x+Co+DCjSCHPjFvGUGy3s1fEYTTZcvEsQ4=";
     fetchSubmodules = true;
   };
 
@@ -97,13 +98,15 @@ stdenv.mkDerivation (finalAttrs: {
     libsysprof-capture
     libxkbcommon
     pcre2
+    util-linux
     webkitgtk_4_1
   ];
 
   postPatch = ''
-    mkdir -p libs/cpm
-    cp ${cpm-cmake}/share/cpm/CPM.cmake libs/cpm/CPM_0.40.2.cmake
+    substituteInPlace CMakeLists.txt \
+      --replace-fail "include(cmake/cpm.cmake)" "include(${cpm-cmake}/share/cpm/CPM.cmake)"
 
+    mkdir -p libs
     cp -r ${finalAttrs.juce} libs/juce
     cp -r ${finalAttrs.googletest} libs/googletest
     cp -r ${finalAttrs.clapJuceExtensions} libs/clap-juce-extensions
@@ -135,6 +138,17 @@ stdenv.mkDerivation (finalAttrs: {
     "TONE3000_LV2"
     "TONE3000_VST3"
   ];
+
+  doCheck = true;
+
+  checkPhase = ''
+    runHook preCheck
+
+    cmake --build . --target DspTests
+    ctest --test-dir test --output-on-failure
+
+    runHook postCheck
+  '';
 
   installPhase =
     if stdenv.hostPlatform.isDarwin
@@ -171,9 +185,26 @@ stdenv.mkDerivation (finalAttrs: {
     patchelf --add-rpath "$runtimeLibraryPath" "$out/lib/vst3/TONE3000.vst3/Contents/${stdenv.hostPlatform.linuxArch}-linux/TONE3000.so"
   '';
 
+  doInstallCheck = true;
+
+  installCheckPhase =
+    if stdenv.hostPlatform.isDarwin
+    then ''
+      find "$out/Library/Audio/Plug-Ins/CLAP/TONE3000.clap" -type f -print -quit | grep -q .
+      find "$out/Library/Audio/Plug-Ins/LV2/TONE3000.lv2" -type f -print -quit | grep -q .
+      find "$out/Library/Audio/Plug-Ins/VST3/TONE3000.vst3" -type f -print -quit | grep -q .
+    ''
+    else ''
+      test -s "$out/lib/clap/TONE3000.clap"
+      test -s "$out/lib/lv2/TONE3000.lv2/libTONE3000.so"
+      test -s "$out/lib/vst3/TONE3000.vst3/Contents/${stdenv.hostPlatform.linuxArch}-linux/TONE3000.so"
+      test -s "$out/lib/vst3/TONE3000.vst3/Contents/Resources/moduleinfo.json"
+    '';
+
   meta = {
     description = "NAM and impulse-response loader integrated with TONE3000";
     homepage = "https://github.com/tone-3000/tone3000-plugin";
+    changelog = "https://github.com/tone-3000/tone3000-plugin/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.mit;
     platforms = [
       "x86_64-linux"
