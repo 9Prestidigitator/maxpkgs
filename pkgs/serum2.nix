@@ -25,13 +25,13 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "serum2";
-  version = "2.1.5-beta-2026-08-14";
+  version = "2.1.5-beta-2026-09-01";
 
   src =
     {
       x86_64-linux = fetchurl {
-        url = "https://www.dropbox.com/scl/fi/a9hqum5hwrh8o9bw7eorb/Serum2_Linux_Beta_26-08-14_c0915e9_x86_64.tar.xz?rlkey=elw22urdvvv9nq7dsmk0bk2hc&st=m02t5l3m&dl=1";
-        hash = "sha256-UXH36QDdCrk1foGa7u6JQTP6GiYVqid5id3SKrYBVvk=";
+        url = "https://www.dropbox.com/scl/fi/shku73xneqtbr1o7j4g58/Serum2_Linux_Beta_26-09-01_aa25b0e_x86_64.tar.xz?rlkey=rup057pnxv5rra65fx9e2voci&st=zuj9xt0e&dl=1";
+        hash = "sha256-oz1La+WovvJDHdwEDQbaDD/Lgy/PTmee8VUC4IYBC3o=";
       };
       aarch64-linux = fetchurl {
         url = "https://www.dropbox.com/scl/fi/0bcsve2nucaa1c1hs3us1/Serum2_Linux_Beta_aarch64_26-08-13_3d11ff7.tar.gz?rlkey=zjlxnxvgfbh6g841xlexz9js8&st=4pphshxv&dl=1";
