@@ -39,6 +39,7 @@ Available platforms are `x86_64-linux`, `aarch64-linux`, and `aarch64-darwin`.
 | `serum2`                                                                       | 2.1.5-beta-2026-08-14                                                                           | Linux                        | Serum 2 beta VST3                                                                   |
 | `spice-oss`                                                                    | unstable-2026-06-16                                                                             | All                          | Standalone, AU (macOS), LV2 (Linux), VST3                                           |
 | `spleeterpp`                                                                   | 0.2.1-unstable-2026-06-16                                                                       | x86_64-linux                 | Melissa support library                                                             |
+| `tone-3000-plugin`                                                             | 0.0.3-unstable-2026-09-02                                                                       | All                          | CLAP, LV2, VST3                                                                     |
 | `ultimate-vocal-remover-gui`                                                   | 5.6.0                                                                                           | All                          | Standalone source-separation GUI                                                    |
 | `wineStagingPatched`                                                           | 11.14                                                                                           | Linux                        | Wine staging with the yabridge cursor fix                                           |
 | `yabridgePatched`, `yabridgectlPatched`                                        | 5.1.1                                                                                           | x86_64-linux                 | Windows plug-in bridge and control tool                                             |
@@ -103,7 +104,7 @@ Most DAWs need their plugin scan paths pointed at the active profile or system p
 
 For Home Manager or user-profile installs, use the matching paths under `~/.nix-profile/lib` or `$HOME/.local/state/nix/profile/lib`.
 
-On macOS, bundles are installed below the active profile at `Library/Audio/Plug-Ins/{CLAP,Components,VST,VST3}` and applications at `Applications`. Point DAWs that support custom scan locations there, or link the individual bundles into the corresponding directories under `~/Library/Audio/Plug-Ins`.
+On macOS, bundles are installed below the active profile at `Library/Audio/Plug-Ins/{CLAP,Components,LV2,VST,VST3}` and applications at `Applications`. Point DAWs that support custom scan locations there, or link the individual bundles into the corresponding directories under `~/Library/Audio/Plug-Ins`.
 
 The Audio Assault packages also provide `amp-locker-install-data`, `drum-locker-install-data`, and `mix-locker-install-data`. Run the matching helper with permission to write `/Users/Shared/Audio Assault` before opening the plug-in.
 
