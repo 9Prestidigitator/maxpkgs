@@ -48,6 +48,28 @@ in
 
     dontBuild = true;
 
+    buildInputs = lib.optionals isLinux [
+      alsa-lib
+      curl
+      fontconfig
+      freetype
+      gtk3
+      libGL
+      libX11
+      libXcomposite
+      libXcursor
+      libXext
+      libXinerama
+      libXrandr
+      libXrender
+      libjack2
+      libsysprof-capture
+      libxkbcommon
+      pcre2
+      util-linux
+      webkitgtk_4_1
+    ];
+
     nativeBuildInputs =
       lib.optionals isLinux [
         autoPatchelfHook
@@ -93,7 +115,7 @@ in
         cp -R TONE3000.vst3 "$out/Library/Audio/Plug-Ins/VST3/"
       '';
 
-    postFixup = lib.optionalString isLinux ''
+    preFixup = lib.optionalString isLinux ''
       runtimeLibraryPath=${lib.makeLibraryPath [
         alsa-lib
         curl
@@ -115,12 +137,16 @@ in
         util-linux
         webkitgtk_4_1
       ]}
-      for plugin in \
-        "$out/lib/clap/TONE3000.clap" \
-        "$out/lib/lv2/TONE3000.lv2/libTONE3000.so" \
-        "$out/lib/vst3/TONE3000.vst3/Contents/x86_64-linux/TONE3000.so"; do
-        patchelf --add-rpath "$runtimeLibraryPath" "$plugin"
-      done
+
+      tone3000AddRuntimeLibraryPath() {
+        for plugin in \
+          "$out/lib/clap/TONE3000.clap" \
+          "$out/lib/lv2/TONE3000.lv2/libTONE3000.so" \
+          "$out/lib/vst3/TONE3000.vst3/Contents/x86_64-linux/TONE3000.so"; do
+          patchelf --add-rpath "$runtimeLibraryPath" "$plugin"
+        done
+      }
+      postFixupHooks+=(tone3000AddRuntimeLibraryPath)
     '';
 
     doInstallCheck = true;
