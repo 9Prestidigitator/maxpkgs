@@ -1,10 +1,9 @@
 {
   alsa-lib,
-  cmake,
-  cpm-cmake,
+  autoPatchelfHook,
+  cpio,
   curl,
-  fetchFromGitHub,
-  fetchNpmDeps,
+  fetchurl,
   fontconfig,
   freetype,
   gtk3,
@@ -20,196 +19,134 @@
   libjack2,
   libsysprof-capture,
   libxkbcommon,
-  nodejs,
-  npmHooks,
   patchelf,
   pcre2,
-  pkg-config,
   stdenv,
   util-linux,
   webkitgtk_4_1,
-}:
-stdenv.mkDerivation (finalAttrs: {
-  pname = "tone3000-plugin";
-  version = "0.0.3";
+  xar,
+}: let
+  isLinux = stdenv.hostPlatform.isLinux;
+  isDarwin = stdenv.hostPlatform.isDarwin;
+in
+  stdenv.mkDerivation {
+    pname = "tone3000-plugin";
+    version = "0.0.4";
 
-  src = fetchFromGitHub {
-    owner = "tone-3000";
-    repo = "tone3000-plugin";
-    tag = "v${finalAttrs.version}";
-    hash = "sha256-+em9x0B4/x+Co+DCjSCHPjFvGUGy3s1fEYTTZcvEsQ4=";
-    fetchSubmodules = true;
-  };
+    src =
+      if isLinux
+      then
+        fetchurl {
+          url = "https://github.com/tone-3000/tone3000-plugin/releases/download/v0.0.4/TONE3000-v0.0.4-linux-x64.tar.gz";
+          hash = "sha256-lscFVYygBYzgWSDAyU1fhBmSYu8L3SV7kmacBb8Np5k=";
+        }
+      else
+        fetchurl {
+          url = "https://github.com/tone-3000/tone3000-plugin/releases/download/v0.0.4/TONE3000-v0.0.4-macos-universal.pkg";
+          hash = "sha256-yTE6xBBUwsBBkDGfqVmUqGC+T/5tf8uv0AgbwZRs+xA=";
+        };
 
-  juce = fetchFromGitHub {
-    owner = "juce-framework";
-    repo = "JUCE";
-    tag = "9.0.1";
-    hash = "sha256-9YbhXKBVER7Ww9pwwd1gwm9R8/975pCNibsCqGviYTk=";
-  };
+    dontBuild = true;
 
-  googletest = fetchFromGitHub {
-    owner = "google";
-    repo = "googletest";
-    tag = "v1.15.2";
-    hash = "sha256-1OJ2SeSscRBNr7zZ/a8bJGIqAnhkg45re0j3DtPfcXM=";
-  };
+    nativeBuildInputs =
+      lib.optionals isLinux [
+        autoPatchelfHook
+        patchelf
+      ]
+      ++ lib.optionals isDarwin [
+        cpio
+        xar
+      ];
 
-  clapJuceExtensions = fetchFromGitHub {
-    owner = "free-audio";
-    repo = "clap-juce-extensions";
-    rev = "c1a5ad025f95d01e03267857fa8276ebeed16500";
-    hash = "sha256-P8rLNI9fXGU8yxXXdOkRD/+T3AMd3zdRM8mHp62dEmA=";
-    fetchSubmodules = true;
-  };
+    unpackPhase =
+      if isLinux
+      then ''
+        mkdir source
+        tar --extract --gzip --file "$src" --strip-components=1 --directory source
+      ''
+      else ''
+        mkdir pkg source
+        xar --extract --file "$src" --directory pkg
+        for component in _clap.pkg _vst3.pkg; do
+          gzip --decompress --stdout "pkg/$component/Payload" \
+            | (cd source && cpio --extract --make-directories --quiet)
+        done
+      '';
 
-  npmDeps = fetchNpmDeps {
-    inherit (finalAttrs) src;
-    sourceRoot = "${finalAttrs.src.name}/ui";
-    hash = "sha256-qqmF4etA+GqlgHhycztvFvu2MUZcjtPMwRvnDIrHpTw=";
-  };
+    sourceRoot = "source";
 
-  npmRoot = "ui";
+    installPhase =
+      if isLinux
+      then ''
+        install -Dm755 TONE3000.clap "$out/lib/clap/TONE3000.clap"
+        install -d "$out/lib/lv2" "$out/lib/vst3"
+        cp -R TONE3000.lv2 "$out/lib/lv2/"
+        cp -R TONE3000.vst3 "$out/lib/vst3/"
+        install -d "$out/share/tone3000"
+        cp -R factory-presets "$out/share/tone3000/"
+      ''
+      else ''
+        install -d \
+          "$out/Library/Audio/Plug-Ins/CLAP" \
+          "$out/Library/Audio/Plug-Ins/VST3"
+        cp -R TONE3000.clap "$out/Library/Audio/Plug-Ins/CLAP/"
+        cp -R TONE3000.vst3 "$out/Library/Audio/Plug-Ins/VST3/"
+      '';
 
-  nativeBuildInputs =
-    [
-      cmake
-      nodejs
-      npmHooks.npmConfigHook
-      pkg-config
-    ]
-    ++ lib.optional stdenv.hostPlatform.isLinux patchelf;
-
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
-    alsa-lib
-    curl
-    fontconfig
-    freetype
-    gtk3
-    libGL
-    libX11
-    libXcomposite
-    libXcursor
-    libXext
-    libXinerama
-    libXrandr
-    libXrender
-    libjack2
-    libsysprof-capture
-    libxkbcommon
-    pcre2
-    util-linux
-    webkitgtk_4_1
-  ];
-
-  postPatch = ''
-    substituteInPlace CMakeLists.txt \
-      --replace-fail "include(cmake/cpm.cmake)" "include(${cpm-cmake}/share/cpm/CPM.cmake)"
-
-    mkdir -p libs
-    cp -r ${finalAttrs.juce} libs/juce
-    cp -r ${finalAttrs.googletest} libs/googletest
-    cp -r ${finalAttrs.clapJuceExtensions} libs/clap-juce-extensions
-    chmod -R u+w libs
-  '';
-
-  preConfigure = ''
-    pushd ui
-    npm run build
-    popd
-
-    cmakeFlagsArray+=(
-      "-DCPM_JUCE_SOURCE=$PWD/libs/juce"
-      "-DCPM_GOOGLETEST_SOURCE=$PWD/libs/googletest"
-      "-DCPM_clap-juce-extensions_SOURCE=$PWD/libs/clap-juce-extensions"
-    )
-  '';
-
-  cmakeFlags =
-    [
-      "-DBUILD_AAX=OFF"
-      "-DBUILD_CLAP=ON"
-      "-DBUILD_LV2=ON"
-    ]
-    ++ lib.optional stdenv.hostPlatform.isLinux "-DCMAKE_TOOLCHAIN_FILE=../cmake/linux-toolchain.cmake";
-
-  buildFlags = [
-    "TONE3000_CLAP"
-    "TONE3000_LV2"
-    "TONE3000_VST3"
-  ];
-
-  doCheck = true;
-
-  checkPhase = ''
-    runHook preCheck
-
-    cmake --build . --target DspTests
-    ctest --test-dir test --output-on-failure
-
-    runHook postCheck
-  '';
-
-  installPhase =
-    if stdenv.hostPlatform.isDarwin
-    then ''
-      runHook preInstall
-
-      artefacts=plugin/TONE3000_artefacts/Release
-      mkdir -p \
-        "$out/Library/Audio/Plug-Ins/CLAP" \
-        "$out/Library/Audio/Plug-Ins/LV2" \
-        "$out/Library/Audio/Plug-Ins/VST3"
-      cp -R "$artefacts/CLAP/TONE3000.clap" "$out/Library/Audio/Plug-Ins/CLAP/"
-      cp -R "$artefacts/LV2/TONE3000.lv2" "$out/Library/Audio/Plug-Ins/LV2/"
-      cp -R "$artefacts/VST3/TONE3000.vst3" "$out/Library/Audio/Plug-Ins/VST3/"
-
-      runHook postInstall
-    ''
-    else ''
-      runHook preInstall
-
-      artefacts=plugin/TONE3000_artefacts/Release
-      mkdir -p "$out/lib/clap" "$out/lib/lv2" "$out/lib/vst3"
-      install -Dm755 "$artefacts/CLAP/TONE3000.clap" "$out/lib/clap/TONE3000.clap"
-      cp -r "$artefacts/LV2/TONE3000.lv2" "$out/lib/lv2/"
-      cp -r "$artefacts/VST3/TONE3000.vst3" "$out/lib/vst3/"
-
-      runHook postInstall
+    postFixup = lib.optionalString isLinux ''
+      runtimeLibraryPath=${lib.makeLibraryPath [
+        alsa-lib
+        curl
+        fontconfig
+        freetype
+        gtk3
+        libGL
+        libX11
+        libXcomposite
+        libXcursor
+        libXext
+        libXinerama
+        libXrandr
+        libXrender
+        libjack2
+        libsysprof-capture
+        libxkbcommon
+        pcre2
+        util-linux
+        webkitgtk_4_1
+      ]}
+      for plugin in \
+        "$out/lib/clap/TONE3000.clap" \
+        "$out/lib/lv2/TONE3000.lv2/libTONE3000.so" \
+        "$out/lib/vst3/TONE3000.vst3/Contents/x86_64-linux/TONE3000.so"; do
+        patchelf --add-rpath "$runtimeLibraryPath" "$plugin"
+      done
     '';
 
-  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
-    runtimeLibraryPath=${lib.makeLibraryPath [curl gtk3 webkitgtk_4_1]}
-    patchelf --add-rpath "$runtimeLibraryPath" "$out/lib/clap/TONE3000.clap"
-    patchelf --add-rpath "$runtimeLibraryPath" "$out/lib/lv2/TONE3000.lv2/libTONE3000.so"
-    patchelf --add-rpath "$runtimeLibraryPath" "$out/lib/vst3/TONE3000.vst3/Contents/${stdenv.hostPlatform.linuxArch}-linux/TONE3000.so"
-  '';
+    doInstallCheck = true;
+    installCheckPhase =
+      if isLinux
+      then ''
+        test -s "$out/lib/clap/TONE3000.clap"
+        test -s "$out/lib/lv2/TONE3000.lv2/libTONE3000.so"
+        test -s "$out/lib/vst3/TONE3000.vst3/Contents/x86_64-linux/TONE3000.so"
+        test -s "$out/lib/vst3/TONE3000.vst3/Contents/Resources/moduleinfo.json"
+      ''
+      else ''
+        test -s "$out/Library/Audio/Plug-Ins/CLAP/TONE3000.clap/Contents/MacOS/TONE3000"
+        test -s "$out/Library/Audio/Plug-Ins/VST3/TONE3000.vst3/Contents/MacOS/TONE3000"
+        test -s "$out/Library/Audio/Plug-Ins/VST3/TONE3000.vst3/Contents/Resources/moduleinfo.json"
+      '';
 
-  doInstallCheck = true;
-
-  installCheckPhase =
-    if stdenv.hostPlatform.isDarwin
-    then ''
-      find "$out/Library/Audio/Plug-Ins/CLAP/TONE3000.clap" -type f -print -quit | grep -q .
-      find "$out/Library/Audio/Plug-Ins/LV2/TONE3000.lv2" -type f -print -quit | grep -q .
-      find "$out/Library/Audio/Plug-Ins/VST3/TONE3000.vst3" -type f -print -quit | grep -q .
-    ''
-    else ''
-      test -s "$out/lib/clap/TONE3000.clap"
-      test -s "$out/lib/lv2/TONE3000.lv2/libTONE3000.so"
-      test -s "$out/lib/vst3/TONE3000.vst3/Contents/${stdenv.hostPlatform.linuxArch}-linux/TONE3000.so"
-      test -s "$out/lib/vst3/TONE3000.vst3/Contents/Resources/moduleinfo.json"
-    '';
-
-  meta = {
-    description = "NAM and impulse-response loader integrated with TONE3000";
-    homepage = "https://github.com/tone-3000/tone3000-plugin";
-    changelog = "https://github.com/tone-3000/tone3000-plugin/releases/tag/v${finalAttrs.version}";
-    license = lib.licenses.mit;
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "aarch64-darwin"
-    ];
-  };
-})
+    meta = {
+      description = "NAM and impulse-response loader integrated with TONE3000";
+      homepage = "https://github.com/tone-3000/tone3000-plugin";
+      changelog = "https://github.com/tone-3000/tone3000-plugin/releases/tag/v0.0.4";
+      license = lib.licenses.mit;
+      sourceProvenance = with lib.sourceTypes; [binaryNativeCode];
+      platforms = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+    };
+  }
