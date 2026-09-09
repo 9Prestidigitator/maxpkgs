@@ -1,9 +1,8 @@
 {
-  perSystem = {pkgs, ...}: rec {
+  perSystem = {pkgs, ...}: {
     devShells.default = pkgs.mkShell {
       name = "nix";
       packages = with pkgs; [
-        # Nix
         nixd
         alejandra
         bash-language-server
