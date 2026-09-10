@@ -28,22 +28,32 @@
 }: let
   isLinux = stdenv.hostPlatform.isLinux;
   isDarwin = stdenv.hostPlatform.isDarwin;
+  linuxArch =
+    if stdenv.hostPlatform.isAarch64
+    then "aarch64"
+    else "x64";
 in
-  stdenv.mkDerivation {
+  stdenv.mkDerivation (finalAttrs: {
     pname = "tone3000-plugin";
-    version = "0.0.4";
+    version = "0.0.7";
 
     src =
       if isLinux
       then
         fetchurl {
-          url = "https://github.com/tone-3000/tone3000-plugin/releases/download/v0.0.4/TONE3000-v0.0.4-linux-x64.tar.gz";
-          hash = "sha256-lscFVYygBYzgWSDAyU1fhBmSYu8L3SV7kmacBb8Np5k=";
+          url = "https://github.com/tone-3000/tone3000-plugin/releases/download/v${finalAttrs.version}/TONE3000-v${finalAttrs.version}-linux-${linuxArch}.tar.gz";
+          hash =
+            {
+              x64 = "sha256-4fi3hGwF+wMpSh6KHNk5aUqjkZtN0e1/C77j5NrMhjc=";
+              aarch64 = "sha256-NdUnHpbREc1vs0t/6Ky/U8OoE3/l2Oo9CNmyv98CMfE=";
+            }.${
+              linuxArch
+            };
         }
       else
         fetchurl {
-          url = "https://github.com/tone-3000/tone3000-plugin/releases/download/v0.0.4/TONE3000-v0.0.4-macos-universal.pkg";
-          hash = "sha256-yTE6xBBUwsBBkDGfqVmUqGC+T/5tf8uv0AgbwZRs+xA=";
+          url = "https://github.com/tone-3000/tone3000-plugin/releases/download/v${finalAttrs.version}/TONE3000-v${finalAttrs.version}-macos-universal.pkg";
+          hash = "sha256-X2fOFlmuO3Im20ae1bWPvJYtueXSCMurQg5nOMkfuk0=";
         };
 
     dontBuild = true;
@@ -142,7 +152,7 @@ in
         for plugin in \
           "$out/lib/clap/TONE3000.clap" \
           "$out/lib/lv2/TONE3000.lv2/libTONE3000.so" \
-          "$out/lib/vst3/TONE3000.vst3/Contents/x86_64-linux/TONE3000.so"; do
+          "$out/lib/vst3/TONE3000.vst3/Contents/${stdenv.hostPlatform.system}/TONE3000.so"; do
           patchelf --add-rpath "$runtimeLibraryPath" "$plugin"
         done
       }
@@ -155,7 +165,7 @@ in
       then ''
         test -s "$out/lib/clap/TONE3000.clap"
         test -s "$out/lib/lv2/TONE3000.lv2/libTONE3000.so"
-        test -s "$out/lib/vst3/TONE3000.vst3/Contents/x86_64-linux/TONE3000.so"
+        test -s "$out/lib/vst3/TONE3000.vst3/Contents/${stdenv.hostPlatform.system}/TONE3000.so"
         test -s "$out/lib/vst3/TONE3000.vst3/Contents/Resources/moduleinfo.json"
       ''
       else ''
@@ -167,12 +177,13 @@ in
     meta = {
       description = "NAM and impulse-response loader integrated with TONE3000";
       homepage = "https://github.com/tone-3000/tone3000-plugin";
-      changelog = "https://github.com/tone-3000/tone3000-plugin/releases/tag/v0.0.4";
+      changelog = "https://github.com/tone-3000/tone3000-plugin/releases/tag/v${finalAttrs.version}";
       license = lib.licenses.mit;
       sourceProvenance = with lib.sourceTypes; [binaryNativeCode];
       platforms = [
         "x86_64-linux"
+        "aarch64-linux"
         "aarch64-darwin"
       ];
     };
-  }
+  })
