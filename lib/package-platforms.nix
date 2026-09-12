@@ -50,7 +50,7 @@
       inner-pitch = innerPitch;
       inner-pitch-free = innerPitchPackages.free;
       inner-pitch-full = innerPitchPackages.full;
-      js-inflator = callPackage ../pkgs/js-inflator.nix {};
+      js-inflator = callPackage ../pkgs/js-inflator/js-inflator.nix {};
       libonnxruntime-neuralnote = callPackage ../pkgs/neuralnote/libonnxruntime-neuralnote.nix {};
       minimeters-demo = minimetersPackages.demo;
       minimeters-full = minimetersPackages.full;
