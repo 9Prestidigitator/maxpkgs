@@ -83,20 +83,22 @@ stdenv.mkDerivation (finalAttrs: {
       patch -d vst3sdk/vstgui4 -p1 --fuzz=0 < ${./vstgui-editor-lifecycle.patch}
     '';
 
-  preConfigure = ''
-    cmakeFlagsArray+=("-Dvst3sdk_SOURCE_DIR=$PWD/vst3sdk")
-    cmakeFlagsArray+=("-DSMTG_PLUGIN_TARGET_USER_PATH=$PWD/build/VST3")
-  '';
+  preConfigure =
+    lib.optionalString stdenv.hostPlatform.isLinux ''
+      cmakeFlagsArray+=("-DCMAKE_CXX_FLAGS=-fpermissive -Wno-changes-meaning")
+    ''
+    + ''
+      cmakeFlagsArray+=("-Dvst3sdk_SOURCE_DIR=$PWD/vst3sdk")
+      cmakeFlagsArray+=("-DSMTG_PLUGIN_TARGET_USER_PATH=$PWD/build/VST3")
+    '';
 
-  cmakeFlags =
-    lib.optional stdenv.hostPlatform.isLinux "-DCMAKE_CXX_FLAGS=-fpermissive -Wno-changes-meaning"
-    ++ [
-      "-DSMTG_CREATE_PLUGIN_LINK=OFF"
-      "-DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF"
-      "-DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=OFF"
-      "-DSMTG_ENABLE_VSTGUI_SUPPORT=ON"
-      "-DSMTG_MDA_VST3_VST2_COMPATIBLE=OFF"
-    ];
+  cmakeFlags = [
+    "-DSMTG_CREATE_PLUGIN_LINK=OFF"
+    "-DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF"
+    "-DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=OFF"
+    "-DSMTG_ENABLE_VSTGUI_SUPPORT=ON"
+    "-DSMTG_MDA_VST3_VST2_COMPATIBLE=OFF"
+  ];
 
   installPhase =
     if stdenv.hostPlatform.isDarwin
