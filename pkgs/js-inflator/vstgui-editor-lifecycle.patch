@@ -1,0 +1,144 @@
+From 9f278de7b0769b8c247ab993b2f463bd7d85ea96 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ren=C3=A9=20Hansen?= <rene@hansen-audio.de>
+Date: Sat, 1 Feb 2025 21:12:16 +0100
+Subject: [PATCH 1/2] Remove all cairo usage from RunLoop and fix #335
+ (open/close editor crash)
+
+---
+ .../lib/platform/linux/cairographicscontext.cpp   | 12 ++++++++++++
+ vstgui/lib/platform/linux/cairographicscontext.h  |  1 +
+ vstgui/lib/platform/linux/x11frame.cpp            |  6 ++++++
+ vstgui/lib/platform/linux/x11platform.cpp         | 15 ---------------
+ 4 files changed, 19 insertions(+), 15 deletions(-)
+
+diff --git a/vstgui/lib/platform/linux/cairographicscontext.cpp b/vstgui/lib/platform/linux/cairographicscontext.cpp
+index ed7e493fd..92625b50b 100644
+--- a/vstgui/lib/platform/linux/cairographicscontext.cpp
++++ b/vstgui/lib/platform/linux/cairographicscontext.cpp
+@@ -77,6 +77,15 @@ PlatformGraphicsDevicePtr CairoGraphicsDeviceFactory::addDevice (cairo_device_t*
+ 	return impl->devices.back ();
+ }
+ 
++//-----------------------------------------------------------------------------
++void CairoGraphicsDeviceFactory::removeDevice (cairo_device_t* device)
++{
++	const auto citer = std::find_if (impl->devices.cbegin (), impl->devices.cend (),
++									 [device] (const auto& dev) { return dev->get () == device; });
++
++	impl->devices.erase (citer);
++}
++
+ //-----------------------------------------------------------------------------
+ struct CairoGraphicsDevice::Impl
+ {
+@@ -96,7 +105,10 @@ CairoGraphicsDevice::CairoGraphicsDevice (cairo_device_t* device)
+ CairoGraphicsDevice::~CairoGraphicsDevice () noexcept
+ {
+ 	if (impl->device)
++	{
++		cairo_device_finish (impl->device);
+ 		cairo_device_destroy (impl->device);
++	}
+ }
+ 
+ //-----------------------------------------------------------------------------
+diff --git a/vstgui/lib/platform/linux/cairographicscontext.h b/vstgui/lib/platform/linux/cairographicscontext.h
+index 9c65d64ec..3476e7b08 100644
+--- a/vstgui/lib/platform/linux/cairographicscontext.h
++++ b/vstgui/lib/platform/linux/cairographicscontext.h
+@@ -97,6 +97,7 @@ class CairoGraphicsDeviceFactory : public IPlatformGraphicsDeviceFactory
+ 	PlatformGraphicsDevicePtr getDeviceForScreen (ScreenInfo::Identifier screen) const override;
+ 
+ 	PlatformGraphicsDevicePtr addDevice (cairo_device_t* device);
++	void removeDevice (cairo_device_t* device);
+ 
+ private:
+ 	struct Impl;
+diff --git a/vstgui/lib/platform/linux/x11frame.cpp b/vstgui/lib/platform/linux/x11frame.cpp
+index 8eb331cb0..d6486989e 100644
+--- a/vstgui/lib/platform/linux/x11frame.cpp
++++ b/vstgui/lib/platform/linux/x11frame.cpp
+@@ -178,6 +178,12 @@ struct DrawHandler
+ 		onSizeChanged (window.getSize ());
+ 	}
+ 
++	~DrawHandler ()
++	{
++		getPlatformFactory ().asLinuxFactory ()->getCairoGraphicsDeviceFactory ().removeDevice (
++			cairo_surface_get_device (windowSurface));
++	}
++
+ 	void onSizeChanged (const CPoint& size)
+ 	{
+ 		cairo_xcb_surface_set_size (windowSurface, size.x, size.y);
+diff --git a/vstgui/lib/platform/linux/x11platform.cpp b/vstgui/lib/platform/linux/x11platform.cpp
+index f09f615bd..6bd5c9e2c 100644
+--- a/vstgui/lib/platform/linux/x11platform.cpp
++++ b/vstgui/lib/platform/linux/x11platform.cpp
+@@ -9,7 +9,6 @@
+ #include "../../events.h"
+ #include "x11frame.h"
+ #include "x11dragging.h"
+-#include "cairobitmap.h"
+ #include <cassert>
+ #include <chrono>
+ #include <array>
+@@ -122,7 +121,6 @@ struct RunLoop::Impl : IEventHandler
+ 	std::array<xcb_cursor_t, CCursorType::kCursorIBeam + 1> cursors {{XCB_CURSOR_NONE}};
+ 	KeyboardEvent lastUnprocessedKeyEvent;
+ 	uint32_t lastUtf32KeyEventChar {0};
+-	cairo_device_t* device {nullptr};
+ 
+ 	void init (const SharedPointer<IRunLoop>& inRunLoop)
+ 	{
+@@ -168,10 +166,6 @@ struct RunLoop::Impl : IEventHandler
+ 		if (--useCount != 0)
+ 			return;
+ 
+-		cairo_device_finish (device);
+-		cairo_device_destroy (device);
+-		device = nullptr;
+-
+ 		if (xcbConnection)
+ 		{
+ 			if (xkbUnprocessedState)
+@@ -557,15 +551,6 @@ Optional<UTF8String> RunLoop::convertCurrentKeyEventToText () const
+ 	return {};
+ }
+ 
+-void RunLoop::setDevice (cairo_device_t* device)
+-{
+-	if (impl->device != device)
+-	{
+-		cairo_device_destroy (impl->device);
+-		impl->device = cairo_device_reference (device);
+-	}
+-}
+-
+ //------------------------------------------------------------------------
+ } // X11
+ } // VSTGUI
+
+From 27ec53ace173469613ae83db7090e8e70522f82b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ren=C3=A9=20Hansen?= <rene@hansen-audio.de>
+Date: Sun, 2 Feb 2025 10:42:57 +0100
+Subject: [PATCH 2/2] Check for end iterator before using it
+
+---
+ vstgui/lib/platform/linux/cairographicscontext.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/vstgui/lib/platform/linux/cairographicscontext.cpp b/vstgui/lib/platform/linux/cairographicscontext.cpp
+index 92625b50b..d7d7a7c45 100644
+--- a/vstgui/lib/platform/linux/cairographicscontext.cpp
++++ b/vstgui/lib/platform/linux/cairographicscontext.cpp
+@@ -83,6 +83,9 @@ void CairoGraphicsDeviceFactory::removeDevice (cairo_device_t* device)
+ 	const auto citer = std::find_if (impl->devices.cbegin (), impl->devices.cend (),
+ 									 [device] (const auto& dev) { return dev->get () == device; });
+ 
++	if (citer == impl->devices.cend ())
++		return;
++
+ 	impl->devices.erase (citer);
+ }
+ 

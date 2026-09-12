@@ -69,13 +69,19 @@ stdenv.mkDerivation (finalAttrs: {
     xcbutilwm
   ];
 
-  postPatch = ''
-    cp -r ${finalAttrs.vst3sdk} vst3sdk
-    chmod -R u+w vst3sdk
-    patchShebangs vst3sdk
-    substituteInPlace vst3sdk/cmake/modules/SMTG_VstGuiSupport.cmake \
-      --replace-fail "set(VSTGUI_STANDALONE ON)" "set(VSTGUI_STANDALONE OFF)"
-  '';
+  postPatch =
+    ''
+      cp -r ${finalAttrs.vst3sdk} vst3sdk
+      chmod -R u+w vst3sdk
+      patchShebangs vst3sdk
+      substituteInPlace vst3sdk/cmake/modules/SMTG_VstGuiSupport.cmake \
+        --replace-fail "set(VSTGUI_STANDALONE ON)" "set(VSTGUI_STANDALONE OFF)"
+    ''
+    + lib.optionalString stdenv.hostPlatform.isLinux ''
+      # Fix Cairo device lifetime when REAPER closes/reopens the embedded editor.
+      # Includes both commits from https://github.com/steinbergmedia/vstgui/pull/337.
+      patch -d vst3sdk/vstgui4 -p1 --fuzz=0 < ${./vstgui-editor-lifecycle.patch}
+    '';
 
   preConfigure = ''
     cmakeFlagsArray+=("-Dvst3sdk_SOURCE_DIR=$PWD/vst3sdk")

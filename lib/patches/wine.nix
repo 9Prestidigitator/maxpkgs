@@ -1,17 +1,35 @@
 {pkgs}: let
+  # Keep the Wine source and staging patches on the same release until nixpkgs
+  # catches up. Updating only src would leave the old staging prePatch in place.
+  version = "11.17";
+  staging = pkgs.fetchFromGitHub {
+    owner = "wine-staging";
+    repo = "wine-staging";
+    tag = "v${version}";
+    hash = "sha256-VSYkI9XTU8Lg5UooZBlRXVQ9hVJ+YdoRr5GAc+jBDsI=";
+  };
+
   # This patch lets yabridge use current Wine staging releases without the
   # cursor-window placement regression that previously required Wine 9.21.
   # Ended up resulting in a lot of new issues when opening and closing plugins,
   # so I'm probably not going to keep using this.
   wineStagingPatched = (pkgs.wineWow64Packages.base.override {wineRelease = "staging";}).overrideAttrs (old: {
-    patches =
-      (old.patches or [])
-      ++ [
-        (pkgs.fetchurl {
-          url = "https://gitlab.winehq.org/-/project/5/uploads/dea8a1e711846f7e7642c16eacd284b4/bug51357.patch";
-          hash = "sha256-ZfW94gCDLGauKEZOid7ndQsaPA6SVGk22CQ3EBWAPm8=";
-        })
-      ];
+    inherit version;
+    src = pkgs.fetchurl {
+      url = "https://dl.winehq.org/wine/source/11.x/wine-${version}.tar.xz";
+      hash = "sha256-jnUuKbuikBrZ+RUTk0XG7mcYSwmdQlcE2RWXHKXAVfw=";
+    };
+    prePatch = pkgs.lib.replaceStrings ["${old.src.staging}"] ["${staging}"] old.prePatch;
+    meta = old.meta // {inherit version;};
+    # Rebase bug51357.patch onto the POINT-based map_event_coords in Wine 11.17.
+    # https://bugs.winehq.org/show_bug.cgi?id=51357
+    postPatch =
+      (old.postPatch or "")
+      + ''
+        substituteInPlace dlls/winex11.drv/mouse.c \
+          --replace-fail '    else if (event_root == root_window) dst = root_to_virtual_screen( root.x, root.y );' \
+          '    /* Use window-relative coordinates for embedded yabridge windows (Wine bug 51357). */'
+      '';
   });
 
   wineSetPatched = pkgs.wineWow64Packages // {yabridge = wineStagingPatched;};

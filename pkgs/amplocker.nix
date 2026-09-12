@@ -20,17 +20,17 @@
 }:
 stdenv.mkDerivation {
   pname = "Amp Locker";
-  version = "1.5.51";
+  version = "1.5.6";
 
   src = fetchurl (
     if stdenv.hostPlatform.isDarwin
     then {
       url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerMac.pkg";
-      hash = "sha256-Dmr7o6AFvFGTZSKjQ5KNw2p026/VrkM0/dUSmQS0mB0=";
+      hash = "sha256-BXE9MV2phMwU7Ve7D4OjXwIFvybox3KAnP48bOOuTeg=";
     }
     else {
       url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerLinux.zip";
-      hash = "sha256-ZHh6Kayc0bZG3sVC/L1xpXXzWGr/eVtzlze9By7RedY=";
+      hash = "sha256-pHh4SN6Vb7CFOOQD+9VFLlNch0lv4dU8EWXjSE68iv8=";
     }
   );
 
@@ -95,7 +95,7 @@ stdenv.mkDerivation {
         "$out/Library/Audio/Plug-Ins/Components" \
         "$out/Library/Audio/Plug-Ins/VST3" \
         "$out/share/audio-assault"
-      cp -R Applications/*.app "$out/Applications/"
+      cp -R 'Applications/Audio Assault/Amp Locker.app' "$out/Applications/"
       cp -R Library/Audio/Plug-Ins/Components/*.component "$out/Library/Audio/Plug-Ins/Components/"
       cp -R Library/Audio/Plug-Ins/VST3/*.vst3 "$out/Library/Audio/Plug-Ins/VST3/"
       cp -R 'Users/Shared/Audio Assault/AmpLockerData' "$out/share/audio-assault/"
