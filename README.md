@@ -39,7 +39,7 @@ Available platforms are `x86_64-linux`, `aarch64-linux`, and `aarch64-darwin`.
 | `serum2`                                                                       | 2.1.5-beta-2026-09-01                                                                           | Linux                        | Serum 2 beta VST3                                                                   |
 | `spice-oss`                                                                    | unstable-2026-06-16                                                                             | All                          | Standalone, AU (macOS), LV2 (Linux), VST3                                           |
 | `spleeterpp`                                                                   | 0.2.1-unstable-2026-06-16                                                                       | x86_64-linux                 | Melissa support library                                                             |
-| `tone-3000-plugin`                                                             | 0.0.7                                                                                           | All                        | CLAP, LV2, VST3 (Linux); CLAP, VST3 (macOS)                                         |
+| `tone-3000-plugin`                                                             | 0.0.9                                                                                           | All                        | CLAP, LV2, VST3 (Linux); CLAP, VST3 (macOS)                                         |
 | `ultimate-vocal-remover-gui`                                                   | 5.6.0                                                                                           | All                          | Standalone source-separation GUI                                                    |
 | `wineStagingPatched`                                                           | 11.17                                                                                           | Linux                        | Wine staging with the yabridge cursor fix                                           |
 | `yabridgePatched`, `yabridgectlPatched`                                        | 5.1.1                                                                                           | x86_64-linux                 | Windows plug-in bridge and control tool                                             |
@@ -48,7 +48,7 @@ Wine staging is pinned to 11.17 with matching staging sources in `lib/patches/wi
 
 `neural-amp-modeler-ui` includes the Neural Amp Modeler DSP plugin, so installing `neural-amp-modeler-lv2` alongside it is supported but unnecessary.
 
-TONE3000 0.0.7 changes block EQ and output-gain routing. Older presets with a block mix below 100% and non-default EQ or output gain may sound different; see the [upstream release notes](https://github.com/tone-3000/tone3000-plugin/releases/tag/v0.0.7).
+TONE3000 0.0.9 fixes model-cache growth and Linux conflicts when loading multiple plug-in formats in one host, and exposes presets as host programs; see the [upstream release notes](https://github.com/tone-3000/tone3000-plugin/releases/tag/v0.0.9). When upgrading from before 0.0.7, older presets with a block mix below 100% and non-default EQ or output gain may sound different because of the [0.0.7 routing changes](https://github.com/tone-3000/tone3000-plugin/releases/tag/v0.0.7).
 
 ## Quick Start
 

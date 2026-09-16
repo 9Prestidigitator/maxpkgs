@@ -26,11 +26,11 @@ stdenv.mkDerivation {
     if stdenv.hostPlatform.isDarwin
     then {
       url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerMac.pkg";
-      hash = "sha256-BXE9MV2phMwU7Ve7D4OjXwIFvybox3KAnP48bOOuTeg=";
+      hash = "sha256-iuFyJup/XxDPJfmgyajDr/IKqS+wbBEga2+4O0cVNDs=";
     }
     else {
       url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerLinux.zip";
-      hash = "sha256-pHh4SN6Vb7CFOOQD+9VFLlNch0lv4dU8EWXjSE68iv8=";
+      hash = "sha256-HLKXhDL3B/g4WnDeBRlMrBQLCBuqEgYr5S9IiLNIdSw=";
     }
   );
 
