@@ -10,12 +10,12 @@ Available platforms are `x86_64-linux`, `aarch64-linux`, and `aarch64-darwin`.
 
 | Attribute                                                                      | Version                                                                                         | Platforms                    | Provides                                                                            |
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------- |
-| `amplocker`                                                                    | 1.5.6                                                                                          | x86_64-linux, aarch64-darwin | Standalone, AU (macOS), LV2 (Linux), VST3                                           |
+| `amplocker`                                                                    | 1.5.8                                                                                          | x86_64-linux, aarch64-darwin | Standalone, AU (macOS), LV2 (Linux), VST3                                           |
 | `audiogridder`                                                                 | 1.2.0                                                                                           | All                          | AudioGridder server, AU (macOS), VST3                                               |
 | `auburn-sounds`, `auburn-sounds-free`                                          | Selene 1.1; Graillon 3.2; Inner Pitch 2.1; Lens 1.4; Renegate 1.6; Panagement 2.8; Couture 1.10 | x86_64-linux, aarch64-darwin | Free AU/CLAP/VST2/VST3 (macOS) or CLAP/LV2/VST2/VST3 (Linux) suite                  |
 | `auburn-sounds-full`                                                           | same as free suite                                                                              | x86_64-linux, aarch64-darwin | Paid suite; see [Paid Packages](#paid-packages)                                     |
 | `auburn-sounds-{selene,graillon,inner-pitch,lens,renegate,panagement,couture}` | corresponding suite version                                                                     | x86_64-linux, aarch64-darwin | Individual free editions; each has `.full`/`.paid`                                  |
-| `bitwig6`                                                                      | 6.1.1                                                                                             | x86_64-linux, aarch64-darwin | Bitwig Studio                                                                       |
+| `bitwig6`                                                                      | 6.1.3                                                                                             | x86_64-linux, aarch64-darwin | Bitwig Studio                                                                       |
 | `chow-tape-model`                                                              | 2.11.4                                                                                          | All                          | Standalone, AU (macOS), CLAP, LV2 (Linux), VST3                                     |
 | `drumlocker`                                                                   | 1.0.3                                                                                           | x86_64-linux, aarch64-darwin | AU (macOS), LV2 (Linux), VST3, and sample-data helper                               |
 | `gvst`                                                                         | 2024-09-25                                                                                      | x86_64-linux                 | VST2 suite                                                                          |
@@ -41,10 +41,10 @@ Available platforms are `x86_64-linux`, `aarch64-linux`, and `aarch64-darwin`.
 | `spleeterpp`                                                                   | 0.2.1-unstable-2026-06-16                                                                       | x86_64-linux                 | Melissa support library                                                             |
 | `tone-3000-plugin`                                                             | 0.0.9                                                                                           | All                        | CLAP, LV2, VST3 (Linux); CLAP, VST3 (macOS)                                         |
 | `ultimate-vocal-remover-gui`                                                   | 5.6.0                                                                                           | All                          | Standalone source-separation GUI                                                    |
-| `wineStagingPatched`                                                           | 11.17                                                                                           | Linux                        | Wine staging with the yabridge cursor fix                                           |
+| `wineStagingPatched`                                                           | 11.18                                                                                           | Linux                        | Wine staging with the yabridge cursor fix                                           |
 | `yabridgePatched`, `yabridgectlPatched`                                        | 5.1.1                                                                                           | x86_64-linux                 | Windows plug-in bridge and control tool                                             |
 
-Wine staging is pinned to 11.17 with matching staging sources in `lib/patches/wine.nix`; the yabridge cursor fix is adapted to this release and applied on top.
+Wine staging is pinned to 11.18 with matching staging sources in `lib/patches/wine.nix`; the yabridge cursor fix is adapted to this release and applied on top.
 
 `neural-amp-modeler-ui` includes the Neural Amp Modeler DSP plugin, so installing `neural-amp-modeler-lv2` alongside it is supported but unnecessary.
 
@@ -114,7 +114,7 @@ The Audio Assault packages also provide `amp-locker-install-data`, `drum-locker-
 
 ## Apple Silicon vendor payloads
 
-Source-built packages need no extra input on Apple Silicon. MiniMeters, Pianoteq, and Serum 2 are vendor binaries, so their extracted macOS payloads must be supplied locally. A `.pkg` can be expanded with `pkgutil --expand-full Installer.pkg destination`.
+Source-built packages need no extra input on Apple Silicon. MiniMeters and Pianoteq are vendor binaries whose extracted macOS payloads must be supplied locally. Serum 2 is currently packaged only for Linux. A `.pkg` can be expanded with `pkgutil --expand-full Installer.pkg destination`.
 
 ```nix
 let

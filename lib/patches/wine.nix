@@ -1,12 +1,12 @@
 {pkgs}: let
   # Keep the Wine source and staging patches on the same release until nixpkgs
   # catches up. Updating only src would leave the old staging prePatch in place.
-  version = "11.17";
+  version = "11.18";
   staging = pkgs.fetchFromGitHub {
     owner = "wine-staging";
     repo = "wine-staging";
     tag = "v${version}";
-    hash = "sha256-VSYkI9XTU8Lg5UooZBlRXVQ9hVJ+YdoRr5GAc+jBDsI=";
+    hash = "sha256-KZCkra0y3XFNrbD2lZ+YUCLyq1POC30Sd4sGCJZuwgQ=";
   };
 
   # This patch lets yabridge use current Wine staging releases without the
@@ -17,11 +17,11 @@
     inherit version;
     src = pkgs.fetchurl {
       url = "https://dl.winehq.org/wine/source/11.x/wine-${version}.tar.xz";
-      hash = "sha256-jnUuKbuikBrZ+RUTk0XG7mcYSwmdQlcE2RWXHKXAVfw=";
+      hash = "sha256-xigvbU2uzxHzq5+aK2xZj2e+fijDY7osroo8RLYR56Q=";
     };
     prePatch = pkgs.lib.replaceStrings ["${old.src.staging}"] ["${staging}"] old.prePatch;
     meta = old.meta // {inherit version;};
-    # Rebase bug51357.patch onto the POINT-based map_event_coords in Wine 11.17.
+    # Rebase bug51357.patch onto the POINT-based map_event_coords in Wine 11.18.
     # https://bugs.winehq.org/show_bug.cgi?id=51357
     postPatch =
       (old.postPatch or "")

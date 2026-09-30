@@ -8,6 +8,7 @@
   python3,
   ffmpeg,
   rubberband,
+  tcl,
   tk,
 }: let
   pythonEnv = python3.withPackages (ps: let
@@ -26,12 +27,12 @@
 
     diffq = ps.buildPythonPackage rec {
       pname = "diffq";
-      version = "0.2.3";
+      version = "0.2.4";
       format = "setuptools";
 
       src = fetchPypi {
         inherit pname version;
-        hash = "sha256-it2HEOYhTUdFQ5/sPT4iWhv73F7mq9zC9izArkIWt1c=";
+        hash = "sha256-BJBkhh6XTr8A0LrauLMkx3UDc3FBntoxUJhbnUd7W9I=";
       };
 
       nativeBuildInputs = [ps.cython];
@@ -68,12 +69,12 @@
 
     onnx2pytorch = ps.buildPythonPackage rec {
       pname = "onnx2pytorch";
-      version = "0.5.1";
+      version = "0.6.0";
       format = "setuptools";
 
       src = fetchPypi {
         inherit pname version;
-        hash = "sha256-XD3fAEg45neTgXdRr/tCbXeVUpDkc7SSoFj8btzujRQ=";
+        hash = "sha256-s4dioUJpROEnPoCKNhARNYiV2+fL2H8tdi4PBY6Yr6g=";
       };
 
       propagatedBuildInputs = with ps; [
@@ -86,6 +87,9 @@
     };
   in
     with ps; [
+      # UVR's bundled tkdnd 2.9.2 requires Tcl/Tk 8. Prefer this tkinter over
+      # the Tk 9 variant propagated by other Python dependencies.
+      (lib.hiPrio (tkinter.override {inherit tcl tk;}))
       audioread
       cryptography
       diffq
