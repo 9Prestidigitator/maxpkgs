@@ -35,7 +35,7 @@
 in
   stdenv.mkDerivation (finalAttrs: {
     pname = "tone3000-plugin";
-    version = "0.0.9";
+    version = "0.0.11";
 
     src =
       if isLinux
@@ -44,8 +44,8 @@ in
           url = "https://github.com/tone-3000/tone3000-plugin/releases/download/v${finalAttrs.version}/TONE3000-v${finalAttrs.version}-linux-${linuxArch}.tar.gz";
           hash =
             {
-              x64 = "sha256-PiP7Y5ZfMQg0CQwcrgNX6gsnnPwU1pgOO+sLe1pUtUY=";
-              aarch64 = "sha256-mrbttnS/ZvQWUX4CWzAjYaXezkYdqxNRe+7enOoLBwA=";
+              x64 = "sha256-0W38+KAHdJ9nItgqnN2FNeETSQLq53P5LDOcgT79kYU=";
+              aarch64 = "sha256-VZkAO6WbnsCyhqBT0cjq43EZ1YKPpRkK6CQMCa23D5M=";
             }.${
               linuxArch
             };
@@ -53,7 +53,7 @@ in
       else
         fetchurl {
           url = "https://github.com/tone-3000/tone3000-plugin/releases/download/v${finalAttrs.version}/TONE3000-v${finalAttrs.version}-macos-universal.pkg";
-          hash = "sha256-TfVhGuI1UR7zhjxPuv0u0GoSer7LksZMi0d0P9o9c14=";
+          hash = "sha256-ScgZwHyE0fjyVnY6LwcMcAIMxcz++/uFBHJX0nk01qA=";
         };
 
     dontBuild = true;
