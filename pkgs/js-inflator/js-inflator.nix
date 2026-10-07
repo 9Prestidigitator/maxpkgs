@@ -81,10 +81,22 @@ stdenv.mkDerivation (finalAttrs: {
       # Fix Cairo device lifetime when REAPER closes/reopens the embedded editor.
       # Includes both commits from https://github.com/steinbergmedia/vstgui/pull/337.
       patch -d vst3sdk/vstgui4 -p1 --fuzz=0 < ${./vstgui-editor-lifecycle.patch}
+    ''
+    + lib.optionalString stdenv.hostPlatform.isDarwin ''
+      substituteInPlace vst3sdk/cmake/modules/SMTG_AddVST3Library.cmake \
+      --replace-fail "COMMAND codesign" "COMMAND /usr/bin/codesign" \
+      --replace-fail "codesign -f -s" "/usr/bin/codesign -f -s"
+      patch -d vst3sdk/vstgui4 -p1 --fuzz=0 < ${./vstgui-editor-lifecycle.patch}
     '';
 
   preConfigure =
-    lib.optionalString stdenv.hostPlatform.isLinux ''
+    lib.optionalString stdenv.hostPlatform.isDarwin ''
+      export XCODE_VERSION=15
+      cmakeFlagsArray+=(
+        "-DCMAKE_CXX_FLAGS=-Wno-error=unused-but-set-variable -Wno-error=deprecated-declarations"
+      )
+    ''
+    + lib.optionalString stdenv.hostPlatform.isLinux ''
       cmakeFlagsArray+=("-DCMAKE_CXX_FLAGS=-fpermissive -Wno-changes-meaning")
     ''
     + ''
@@ -92,13 +104,18 @@ stdenv.mkDerivation (finalAttrs: {
       cmakeFlagsArray+=("-DSMTG_PLUGIN_TARGET_USER_PATH=$PWD/build/VST3")
     '';
 
-  cmakeFlags = [
-    "-DSMTG_CREATE_PLUGIN_LINK=OFF"
-    "-DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF"
-    "-DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=OFF"
-    "-DSMTG_ENABLE_VSTGUI_SUPPORT=ON"
-    "-DSMTG_MDA_VST3_VST2_COMPATIBLE=OFF"
-  ];
+  cmakeFlags =
+    [
+      "-DSMTG_CREATE_PLUGIN_LINK=OFF"
+      "-DSMTG_ENABLE_VST3_PLUGIN_EXAMPLES=OFF"
+      "-DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=OFF"
+      "-DSMTG_ENABLE_VSTGUI_SUPPORT=ON"
+      "-DSMTG_MDA_VST3_VST2_COMPATIBLE=OFF"
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      "-DXCODE_VERSION=15"
+      "-DSMTG_RUN_VST_VALIDATOR=OFF"
+    ];
 
   installPhase =
     if stdenv.hostPlatform.isDarwin
