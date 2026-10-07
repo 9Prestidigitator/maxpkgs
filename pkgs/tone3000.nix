@@ -101,7 +101,7 @@ in
       ''
       else ''
         mkdir pkg source
-        xar --extract --file "$src" --directory pkg
+        xar -xf "$src" -C pkg
         for component in _clap.pkg _vst3.pkg _standalone.pkg; do
           gzip --decompress --stdout "pkg/$component/Payload" \
             | (cd source && cpio --extract --make-directories --quiet)
