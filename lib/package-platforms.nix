@@ -69,7 +69,7 @@
       rubberband = callPackage ../pkgs/rubberband.nix {};
       serum2 = callPackage ../pkgs/serum2.nix {};
       spice-oss = callPackage ../pkgs/spice-oss.nix {};
-      tone3000 = callPackage ../pkgs/tone3000.nix {};
+      tone3000-bin = callPackage ../pkgs/tone3000-bin.nix {};
       ultimate-vocal-remover-gui = callPackage ../pkgs/ultimate-vocal-remover-gui.nix {};
     }
     // lib.optionalAttrs (lib.hasAttr system inputs.pulse-visualizer.packages) {
