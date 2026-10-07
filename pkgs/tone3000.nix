@@ -36,7 +36,7 @@
     else "x64";
 in
   stdenv.mkDerivation (finalAttrs: {
-    pname = "tone3000-plugin";
+    pname = "tone3000";
     version = "0.0.11";
 
     src =
