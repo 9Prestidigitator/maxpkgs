@@ -63,6 +63,12 @@ stdenv.mkDerivation (finalAttrs: {
         juce::juce_audio_utils"
     substituteInPlace CMakeLists.txt \
       --replace-fail "juce::juce_recommended_lto_flags" ""
+    substituteInPlace CMakeLists.txt \
+      --replace-fail "JUCE_JACK=1" "JUCE_JACK=${
+      if stdenv.hostPlatform.isLinux
+      then "1"
+      else "0"
+    }"
   '';
 
   cmakeFlags = [
