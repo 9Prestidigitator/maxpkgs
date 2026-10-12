@@ -18,6 +18,12 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-40yrWYQDFItGmm6F3jHexjPrn4aLvKv2Dt4l7RMFJXo=";
   };
 
+  postPatch = ''
+    substituteInPlace resources/manifest.ttl.in --replace-fail \
+      '@CMAKE_SHARED_MODULE_SUFFIX@' \
+      '@CMAKE_SHARED_LIBRARY_SUFFIX@'
+  '';
+
   nativeBuildInputs = [cmake];
 
   meta = {
