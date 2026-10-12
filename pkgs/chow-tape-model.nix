@@ -102,6 +102,10 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace modules/RTNeural/CMakeLists.txt --replace-fail \
       'cmake_minimum_required(VERSION 3.1)' \
       'cmake_minimum_required(VERSION 4.0)'
+
+    substituteInPlace modules/JUCE/extras/Build/CMake/JUCEUtils.cmake --replace-fail \
+      'find_program(JUCE_XCRUN xcrun)' \
+      'set(JUCE_XCRUN "")'
   '';
 
   installPhase =
