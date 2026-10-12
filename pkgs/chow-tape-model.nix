@@ -124,7 +124,7 @@ stdenv.mkDerivation (finalAttrs: {
       cp -R "$artefacts/AU/CHOWTapeModel.component" "$out/Library/Audio/Plug-Ins/Components/"
       cp -R "$artefacts/VST3/CHOWTapeModel.vst3" "$out/Library/Audio/Plug-Ins/VST3/"
       cp -R "$artefacts/CLAP/CHOWTapeModel.clap" "$out/Library/Audio/Plug-Ins/CLAP/"
-      cp ../Manual/ChowTapeManual.pdf "$out/share/doc/CHOWTapeModel/"
+      cp ../../Manual/ChowTapeManual.pdf "$out/share/doc/CHOWTapeModel/"
 
       runHook postInstall
     ''
