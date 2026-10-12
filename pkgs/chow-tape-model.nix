@@ -83,11 +83,15 @@ stdenv.mkDerivation (finalAttrs: {
     sqlite
   ];
 
-  cmakeFlags = lib.optionals stdenv.hostPlatform.isLinux [
-    "-DCMAKE_AR=${stdenv.cc.cc}/bin/gcc-ar"
-    "-DCMAKE_RANLIB=${stdenv.cc.cc}/bin/gcc-ranlib"
-    "-DCMAKE_NM=${stdenv.cc.cc}/bin/gcc-nm"
-  ];
+  cmakeFlags =
+    lib.optionals stdenv.hostPlatform.isLinux [
+      "-DCMAKE_AR=${stdenv.cc.cc}/bin/gcc-ar"
+      "-DCMAKE_RANLIB=${stdenv.cc.cc}/bin/gcc-ranlib"
+      "-DCMAKE_NM=${stdenv.cc.cc}/bin/gcc-nm"
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      "-DCMAKE_OSX_DEPLOYMENT_TARGET=${stdenv.hostPlatform.darwinMinVersion}"
+    ];
 
   cmakeBuildType = "Release";
 
