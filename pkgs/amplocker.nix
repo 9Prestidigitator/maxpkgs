@@ -20,17 +20,17 @@
 }:
 stdenv.mkDerivation {
   pname = "Amp Locker";
-  version = "1.5.8";
+  version = "1.5.9";
 
   src = fetchurl (
     if stdenv.hostPlatform.isDarwin
     then {
       url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerMac.pkg";
-      hash = "sha256-dmUKhU2LIVmAVsDPmlCw1ebUi756YZnkkTY5DFN2dMA=";
+      hash = "sha256-lUDVOr4u9cwgsggtuEAMv+DGFqijl1/e03g0R8HTrKU=";
     }
     else {
       url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerLinux.zip";
-      hash = "sha256-eUcUnPfzP4V7eMVRxH6+eSCIGid7l9yCKBB4rTpYgBI=";
+      hash = "sha256-IDIrfG8jbRo4fOQLc8qw1CCr1JJZ8Ppb64dPS9fjqAU=";
     }
   );
 

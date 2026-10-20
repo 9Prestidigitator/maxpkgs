@@ -44,6 +44,7 @@
       auburn-sounds-selene = withPassthru auburnSoundsPackages.selene.default auburnSoundsPackages.selene;
       bitwig6 = callPackage ../pkgs/bitwig6.nix {};
       chow-tape-model = callPackage ../pkgs/chow-tape-model.nix {};
+      drumgizmo = callPackage ../pkgs/drumgizmo.nix {};
       drumlocker = callPackage ../pkgs/drumlocker.nix {};
       gvst = callPackage ../pkgs/gvst.nix {};
       ildaeil = callPackage ../pkgs/ildaeil.nix {};

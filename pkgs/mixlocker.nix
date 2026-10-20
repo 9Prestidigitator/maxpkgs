@@ -13,17 +13,17 @@
 }:
 stdenv.mkDerivation {
   pname = "mixlocker";
-  version = "1.0.9";
+  version = "1.1.0";
 
   src = fetchurl (
     if stdenv.hostPlatform.isDarwin
     then {
       url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/MixLockerMac.pkg";
-      hash = "sha256-NOT1E4eg12YgngF6g900PTYts2P9EG+eisAX2iElcW4=";
+      hash = "sha256-xxNYAQOoCp6B799O9zP3/anKp1ZWvgvJ4+he0hkiS/k=";
     }
     else {
       url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/MixLockerLinux.zip";
-      hash = "sha256-kk/P6qLFzevTaiR9/6R+l195W0dT70QopU/1Hg2D7So=";
+      hash = "sha256-BChmS57QP1wZ1E9t3ZllI18c4aSlV7ljcxWxkZ01g7Q=";
     }
   );
 

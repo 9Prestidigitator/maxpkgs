@@ -2,7 +2,8 @@
   alsa-lib,
   cmake,
   fetchFromGitHub,
-  fftwFloat,
+  fetchurl,
+  curl,
   fontconfig,
   freetype,
   lib,
@@ -13,31 +14,31 @@
   libXext,
   libXinerama,
   libXrandr,
-  onnxruntime,
+  python3,
   pkg-config,
   stdenv,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "neuralnote";
-  version = "1.1.0";
+  version = "2.1.0";
 
   src = fetchFromGitHub {
     owner = "DamRsn";
     repo = "NeuralNote";
     tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
-    hash = "sha256-vZdRXXDQvJ8pCtYpp2ZfMfOpPWCx+9trOwO1m4F22Ww=";
+    hash = "sha256-5r+MxLof+hKZf+koMJG+qdOBdHsv8AI0l/+WJTTISVM=";
   };
 
   nativeBuildInputs = [
     cmake
     pkg-config
+    python3
   ];
 
   buildInputs =
     [
-      fftwFloat
-      onnxruntime
+      curl
     ]
     ++ lib.optionals stdenv.hostPlatform.isLinux [
       alsa-lib
@@ -53,32 +54,47 @@ stdenv.mkDerivation (finalAttrs: {
     ];
 
   postPatch = ''
-    substituteInPlace ThirdParty/RTNeural/CMakeLists.txt \
-      --replace-fail 'include(cmake/CPM.cmake)' '# CPM is only needed for tests'
-
     substituteInPlace CMakeLists.txt \
-      --replace-fail 'add_library(onnxruntime STATIC IMPORTED)' 'add_library(onnxruntime SHARED IMPORTED)' \
       --replace-fail 'set(COPY_PLUGIN_AFTER_BUILD TRUE)' 'set(COPY_PLUGIN_AFTER_BUILD FALSE)'
 
-    mkdir -p ThirdParty/onnxruntime/lib
-    ln -s ${lib.getLib onnxruntime}/lib/libonnxruntime.${
-      if stdenv.hostPlatform.isDarwin
-      then "dylib"
-      else "so"
-    } \
-      ThirdParty/onnxruntime/lib/libonnxruntime.a
-    ln -s ${lib.getDev onnxruntime}/include \
-      ThirdParty/onnxruntime/include
-
-    mv Lib/ModelData/features_model.onnx \
-      Lib/ModelData/features_model.ort
+    # Supply the pinned soundfonts locally; the build must not use the network.
+    mkdir -p NeuralNote/Assets/SoundFont
+    cp ${finalAttrs.musescoreSoundfont} NeuralNote/Assets/SoundFont/MuseScore_General.sf3
+    cp ${finalAttrs.fluidSoundfont} NeuralNote/Assets/SoundFont/FluidR3Mono_GM.sf3
+    python3 Tools/make_soundfont.py
   '';
 
-  cmakeFlags = lib.optionals stdenv.hostPlatform.isLinux [
-    "-DCMAKE_AR=${stdenv.cc.cc}/bin/gcc-ar"
-    "-DCMAKE_RANLIB=${stdenv.cc.cc}/bin/gcc-ranlib"
-    "-DCMAKE_NM=${stdenv.cc.cc}/bin/gcc-nm"
-  ];
+  musescoreSoundfont = fetchurl {
+    url = "https://ftp.osuosl.org/pub/musescore/soundfont/MuseScore_General/MuseScore_General.sf3";
+    sha256 = "5b85b6c2c61d10b2b91cddd41efcce7b25cd31c8271d511c73afafbef20b6fa3";
+  };
+  fluidSoundfont = fetchurl {
+    url = "https://raw.githubusercontent.com/musescore/MuseScore/45924076871483cb96b859cc374c5fbdbf76ba53/share/sound/FluidR3Mono_GM.sf3";
+    sha256 = "cfcd66d89e8386823400eca64934b14fbea7bf48ba1f00d21189af1262794ec2";
+  };
+  ggmlSrc = fetchFromGitHub {
+    owner = "ggml-org";
+    repo = "ggml";
+    rev = "e91ded11bdcd78c42f9c8d3978ff6686eb4c1226";
+    hash = "sha256-QArqnQ5//Ft9Knm1Caqz68t4ikNQnk+O+OZUTfZlVCk=";
+  };
+
+  cmakeFlags =
+    [
+      (lib.cmakeFeature "FETCHCONTENT_SOURCE_DIR_GGML" "${finalAttrs.ggmlSrc}")
+      (lib.cmakeBool "NEURALNOTE_FETCH_SOUNDFONT" false)
+      (lib.cmakeBool "NEURALNOTE_SYMBOLS" false)
+      (lib.cmakeBool "MUSCRIPTOR_METAL_PRECOMPILED" false)
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      "-DCMAKE_AR=${stdenv.cc.cc}/bin/gcc-ar"
+      "-DCMAKE_RANLIB=${stdenv.cc.cc}/bin/gcc-ranlib"
+      "-DCMAKE_NM=${stdenv.cc.cc}/bin/gcc-nm"
+    ];
+
+  preConfigure = ''
+    export CMAKE_BUILD_PARALLEL_LEVEL="$NIX_BUILD_CORES"
+  '';
 
   cmakeBuildType = "Release";
 
@@ -108,18 +124,20 @@ stdenv.mkDerivation (finalAttrs: {
       runHook postInstall
     '';
 
+  postInstall = ''
+    install -Dm644 ../Installers/license.txt $out/share/licenses/neuralnote/license.txt
+  '';
+
+  # JUCE loads these libraries dynamically; keep them in the runtime closure.
   env.NIX_LDFLAGS = lib.optionalString stdenv.hostPlatform.isLinux (toString [
-    "-rpath"
-    "${lib.getLib onnxruntime}/lib"
+    "--no-as-needed"
     "-lX11"
     "-lXext"
     "-lXcursor"
     "-lXinerama"
     "-lXrandr"
+    "--as-needed"
   ]);
-
-  env.LD_LIBRARY_PATH = lib.optionalString stdenv.hostPlatform.isLinux (lib.makeLibraryPath [onnxruntime]);
-  env.DYLD_LIBRARY_PATH = lib.optionalString stdenv.hostPlatform.isDarwin (lib.makeLibraryPath [onnxruntime]);
 
   meta = {
     description = "Audio plug-in for automatic music transcription";
