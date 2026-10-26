@@ -30,7 +30,7 @@ stdenv.mkDerivation {
     }
     else {
       url = "https://audioassaultdownloads.s3.amazonaws.com/AmpLocker/AmpLocker109/AmpLockerLinux.zip";
-      hash = "sha256-IDIrfG8jbRo4fOQLc8qw1CCr1JJZ8Ppb64dPS9fjqAU=";
+      hash = "sha256-xMKDM593Mbw6P8sKDMJMcTdnsOwLgc68CgqUDwBVYAY=";
     }
   );
 
