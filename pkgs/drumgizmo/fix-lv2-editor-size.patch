@@ -1,0 +1,61 @@
+Initialize the LV2 editor size and reject host resizes below its minimum.
+
+Small host windows otherwise underflow unsigned child-widget dimensions.
+Keep the generic Widget assertion so unrelated invalid layouts remain visible.
+
+--- a/plugin/drumgizmo_plugin.cc
++++ b/plugin/drumgizmo_plugin.cc
+@@ -318,6 +318,8 @@
+ void* DrumGizmoPlugin::createWindow(void* parent)
+ {
+ 	plugin_gui = std::make_shared<GUI::MainWindow>(settings, parent);
++	// Hosts may inspect the widget before honoring the LV2 resize request.
++	plugin_gui->resize(GUI::MainWindow::main_width, GUI::MainWindow::main_height);
+ 	resizeWindow(GUI::MainWindow::main_width, GUI::MainWindow::main_height);
+ 	onShowWindow();
+ 
+--- a/dggui/window.h
++++ b/dggui/window.h
+@@ -84,7 +84,7 @@
+ 	// From Widget:
+ 	std::size_t translateToWindowX() override;
+ 	std::size_t translateToWindowY() override;
+-	void resized(std::size_t width, std::size_t height);
++	virtual void resized(std::size_t width, std::size_t height);
+ 	void moved(int x, int y);
+ 
+ 	//! Returns true if window pixel buffer changed and needs to be copied to
+--- a/plugingui/mainwindow.h
++++ b/plugingui/mainwindow.h
+@@ -52,6 +52,8 @@
+ 	MainWindow(Settings& settings, void* native_window);
+ 	~MainWindow();
+ 
++	void resized(std::size_t width, std::size_t height) override;
++
+ 	//! Process all events and messages in queue
+ 	//! \return true if not closing, returns false if closing.
+ 	bool processEvents();
+--- a/plugingui/mainwindow.cc
++++ b/plugingui/mainwindow.cc
+@@ -106,6 +106,20 @@
+ 	painter.drawImage(width() - 16, bar_height-1, sidebar);
+ }
+ 
++void MainWindow::resized(std::size_t width, std::size_t height)
++{
++	// Fixed-size controls and their margins do not fit below the default size.
++	// Clamp the native size before Window::resized dispatches layout callbacks.
++	auto size = getNativeSize();
++	if(size.width < main_width || size.height < main_height)
++	{
++		resize(std::max(size.width, main_width),
++		       std::max(size.height, main_height));
++		return; // Lay out after the native resize has completed.
++	}
++	dggui::Window::resized(width, height);
++}
++
+ void MainWindow::sizeChanged(std::size_t width, std::size_t height)
+ {
+ 	tabs.resize(std::max((int)width - 2 * 16, 0), height);

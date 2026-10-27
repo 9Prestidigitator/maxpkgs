@@ -1,5 +1,6 @@
 {
   lib,
+  callPackage,
   stdenv,
   fetchurl,
   fetchDebianPatch,
@@ -17,7 +18,7 @@
   pkg-config,
   zita-resampler,
 }:
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: rec {
   version = "0.9.20";
   pname = "drumgizmo";
 
@@ -36,6 +37,9 @@ stdenv.mkDerivation rec {
         hash = "sha256-y5NDZ+3t6GkBeF/5UY8dwtH8k0cuM+5SGBGPSV7AX7M=";
       })
       ./drumgizmo/fix-non-ascii.patch
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      ./drumgizmo/fix-lv2-editor-size.patch
     ]
     ++ lib.optionals stdenv.hostPlatform.isDarwin [
       ./drumgizmo/fix-cocoa-editor.patch
@@ -68,6 +72,12 @@ stdenv.mkDerivation rec {
       zita-resampler
     ];
 
+  passthru.tests = lib.optionalAttrs stdenv.hostPlatform.isLinux {
+    lv2-resize = callPackage ./drumgizmo/test-lv2-resize.nix {
+      drumgizmo = finalAttrs.finalPackage;
+    };
+  };
+
   meta = {
     description = "LV2 sample based drum plugin";
     homepage = "https://www.drumgizmo.org";
@@ -75,4 +85,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
     maintainers = [lib.maintainers.nico202];
   };
-}
+})
