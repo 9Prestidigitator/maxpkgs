@@ -1,0 +1,125 @@
+Fix Cocoa editor embedding and RGB buffer reads.
+
+Keep the plugin view in the parent supplied by the host and return that
+view as the LV2 widget. Do not resize the host window for an embedded UI,
+and detach the editor view when it is destroyed.
+
+Render using the actual RGB buffer dimensions and read exactly three bytes
+per pixel. The old four-byte load overran the final pixel; using the host
+view dimensions could also read beyond the backing buffer during resize.
+Handle empty buffers and failed bitmap creation, and release image objects.
+
+--- a/dggui/nativewindow_cocoa.mm
++++ b/dggui/nativewindow_cocoa.mm
+@@ -518,11 +518,7 @@
+ 		                             native:this]
+ 		  retain];
+ 
+-	if(native_window)
+-	{
+-		[[priv->window contentView] addSubview:priv->view];
+-	}
+-	else
++	if(!native_window)
+ 	{
+ 		[priv->window setReleasedWhenClosed:NO];
+ 		[priv->window setContentView:priv->view];
+@@ -552,6 +548,7 @@
+ 	[priv->listener release];
+ 
+ 	[priv->view unbindNative];
++	[priv->view removeFromSuperview];
+ 	[priv->view release];
+ 
+ 	if(native_window)
+@@ -592,7 +589,14 @@
+ 
+ void NativeWindowCocoa::resize(std::size_t width, std::size_t height)
+ {
+-	[priv->window setContentSize:NSMakeSize(width, height)];
++	if(native_window)
++	{
++		[priv->view setFrameSize:NSMakeSize(width, height)];
++	}
++	else
++	{
++		[priv->window setContentSize:NSMakeSize(width, height)];
++	}
+ }
+ 
+ std::pair<std::size_t, std::size_t> NativeWindowCocoa::getSize() const
+@@ -646,18 +650,13 @@
+ 
+ void NativeWindowCocoa::redraw(const Rect& dirty_rect)
+ {
+-	NSSize size;
+-	if(native_window)
+-	{
+-		size = [priv->parent_view frame].size;
+-	}
+-	else
+-	{
+-		size = [priv->view frame].size;
+-	}
+-
+-	std::size_t width = size.width;
+-	std::size_t height = size.height;
++	// The host view can be larger than our backing buffer during resizing.
++	const auto width = window.wpixbuf.width;
++	const auto height = window.wpixbuf.height;
++	if(width == 0 || height == 0 || window.wpixbuf.buf == nullptr)
++	{
++		return;
++	}
+ 
+ 	if(priv->pixel_buffer == nullptr ||
+ 	   priv->pixel_buffer_width != width ||
+@@ -675,6 +674,10 @@
+ 		                      8, width * 4, rgb,
+ 		                      IMAGE_FLAGS);
+ 	CGColorSpaceRelease(rgb);
++	if(gc == nullptr)
++	{
++		return;
++	}
+ 
+ 	size_t pitch = CGBitmapContextGetBytesPerRow(gc);
+ 	uint8_t *buffer = (uint8_t *)CGBitmapContextGetData(gc);
+@@ -692,17 +695,26 @@
+ 		Pixel *row = (Pixel *)(buffer + y * pitch);
+ 		for(std::size_t x = dirty_rect.x1; x < std::min(dirty_rect.x2, width); ++x)
+ 		{
+-			row[x] = *(Pixel*)&pixels[(y * width + x) * 3];
++			const auto* pixel = &pixels[(y * width + x) * 3];
++			row[x].red = pixel[0];
++			row[x].green = pixel[1];
++			row[x].blue = pixel[2];
+ 			row[x].alpha = 0xff;
+ 		}
+ 	}
+ 	CGImageRef image = CGBitmapContextCreateImage(gc);
+ 	CGContextRelease(gc);
+ 
++	if(image == nullptr)
++	{
++		return;
++	}
+ 	auto nsImage = [[NSImage alloc] initWithCGImage:image size:NSZeroSize];
++	CGImageRelease(image);
+ 
+ 	id layerContents = [nsImage layerContentsForContentsScale:scale];
+ 	[[priv->view layer] setContents:layerContents];
++	[nsImage release];
+ 	updateLayerOffset();
+ 	[[priv->view layer] setContentsScale:scale];
+ }
+@@ -772,7 +784,8 @@
+ 	}
+ 	else // 64 bit machine
+ 	{
+-		return [priv->window contentView];
++		// LV2 CocoaUI widgets are the plug-in's NSView, never the host's view.
++		return priv->view;
+ 	}
+ }
+ 

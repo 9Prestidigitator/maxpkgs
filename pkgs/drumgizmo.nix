@@ -26,16 +26,20 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-AF8gQLiB29j963uI84TyNHIC0qwEWOCqmZIUWGq8V2o=";
   };
 
-  patches = [
-    (fetchDebianPatch {
-      pname = "drumgizmo";
-      version = "0.9.20";
-      debianRevision = "3";
-      patch = "0005-fix_ftbfs_with_gcc13.patch";
-      hash = "sha256-y5NDZ+3t6GkBeF/5UY8dwtH8k0cuM+5SGBGPSV7AX7M=";
-    })
-    ./drumgizmo/fix-non-ascii.patch
-  ];
+  patches =
+    [
+      (fetchDebianPatch {
+        pname = "drumgizmo";
+        version = "0.9.20";
+        debianRevision = "3";
+        patch = "0005-fix_ftbfs_with_gcc13.patch";
+        hash = "sha256-y5NDZ+3t6GkBeF/5UY8dwtH8k0cuM+5SGBGPSV7AX7M=";
+      })
+      ./drumgizmo/fix-non-ascii.patch
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      ./drumgizmo/fix-cocoa-editor.patch
+    ];
 
   configureFlags =
     ["--enable-lv2"]
