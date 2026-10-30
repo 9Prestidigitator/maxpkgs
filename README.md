@@ -19,6 +19,7 @@ Available platforms are `x86_64-linux`, `aarch64-linux`, and `aarch64-darwin`.
 | `chow-tape-model`                                                              | 2.11.4                                                                                          | All                          | Standalone, AU (macOS), CLAP, LV2 (Linux), VST3                                     |
 | `drumlocker`                                                                   | 1.0.3                                                                                           | x86_64-linux, aarch64-darwin | AU (macOS), LV2 (Linux), VST3, and sample-data helper                               |
 | `gvst`                                                                         | 2024-09-25                                                                                      | x86_64-linux                 | VST2 suite                                                                          |
+| `guitar-pro8`                                                                  | 8.1.5-31                                                                                        | x86_64-linux, aarch64-darwin | Native macOS app; Windows installer with Wine helper on Linux                        |
 | `ildaeil`                                                                      | unstable-2026-06-23                                                                             | Linux                        | Audio plug-in host                                                                  |
 | `inner-pitch`, `inner-pitch-free`, `inner-pitch-full`                          | 2.1                                                                                             | x86_64-linux, aarch64-darwin | Auburn Sounds Inner Pitch aliases                                                   |
 | `js-inflator`                                                                  | 2.0.3.2                                                                                         | All                          | VST3                                                                                |
@@ -98,6 +99,43 @@ nix run github:9Prestidigitator/maxpkgs#minimeters-demo
 nix run github:9Prestidigitator/maxpkgs#bitwig6
 nix build github:9Prestidigitator/maxpkgs#auburn-sounds-free
 ```
+
+## Guitar Pro 8
+
+Add `pkgs.guitar-pro8` through the overlay, or use `nix run .#guitar-pro8`.
+On macOS this opens the native universal app, installed under
+`Applications/Guitar Pro 8.app`. The `guitar-pro8` command can also open score
+files, for example `guitar-pro8 song.gp`.
+
+On x86_64 Linux, `nix run .#guitar-pro8` (or `guitar-pro8-install` from your
+profile) opens the Windows installer with Wine. Installation is interactive and
+only happens when you run the helper. It defaults to
+`${XDG_DATA_HOME:-$HOME/.local/share}/guitar-pro8/wine`; set `WINEPREFIX` to use an
+existing prefix. For example:
+
+```sh
+WINEPREFIX="$HOME/Guitar Pro Wine" nix run .#guitar-pro8
+```
+
+The original installer is available at
+`share/guitar-pro8/guitar-pro-8-setup.exe` in the package output for use with
+your own Wine setup. The helper uses `wineWow64Packages.stable` by default;
+`pkgs.guitar-pro8.override { wine = pkgs.wineWow64Packages.staging; }` selects a
+different Wine package. After installation, launch the installed application
+through that same Wine prefix; running the helper again opens the installer.
+
+These are the application-only downloads from Arobas Music's public update
+feed. RSE soundbanks are not bundled: use the vendor's full installer to install
+them separately (on Linux, in the same Wine prefix), or use MIDI playback.
+See the [official soundbank installation instructions](https://support.guitar-pro.com/hc/en-us/articles/19088288716957-GP8-No-sound-during-playback-with-Guitar-Pro-8).
+Normal trial/license activation applies. Wine compatibility and native macOS
+runtime behavior have not been verified here.
+
+Downloads are hash-pinned. The fetcher obtains a fresh signed URL and checks the
+expected version; if the vendor removes that version from its update feed, a
+new version/hash or an `overrideAttrs` supplying the matching local `src` archive
+is required. Update the macOS application through Nix rather than the in-app
+updater, since its app bundle is in the read-only Nix store.
 
 ## Plugin Paths
 

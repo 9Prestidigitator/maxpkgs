@@ -47,6 +47,7 @@
       drumgizmo = callPackage ../pkgs/drumgizmo.nix {};
       drumlocker = callPackage ../pkgs/drumlocker.nix {};
       gvst = callPackage ../pkgs/gvst.nix {};
+      guitar-pro8 = callPackage ../pkgs/guitar-pro8.nix {};
       ildaeil = callPackage ../pkgs/ildaeil.nix {};
       inner-pitch = innerPitch;
       inner-pitch-free = innerPitchPackages.free;
