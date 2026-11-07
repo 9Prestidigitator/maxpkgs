@@ -72,6 +72,7 @@
       buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
         (lib.getLib stdenv.cc.cc) # libgcc_s.so.1, libstdc++.so.6
         alsa-lib # libasound.so.2
+        (lib.getLib curl) # libcurl.so.4 (Pianoteq 9.3+)
         freetype # libfreetype.so.6
         libglvnd # libGL.so.1
       ];
@@ -305,7 +306,7 @@
   version6 = "6.7.3";
   version7 = "7.5.4";
   version8 = "8.4.0";
-  version9 = "9.2.5";
+  version9 = "9.3.0";
 
   mkStandard = version: hash:
     mkPianoteq {
@@ -370,7 +371,7 @@
 in rec {
   standard_9 = mkStandard version9 (hashes.standard_9 or lib.fakeHash);
   stage_9 = mkStage version9 (hashes.stage_9 or lib.fakeHash);
-  standard-trial_9 = mkStandardTrial version9 (hashes."standard-trial_9" or "sha256-PXE26LcU9/ErCrooUi0YxUGzlj9mxWtyUkTwgfOT8M0=");
+  standard-trial_9 = mkStandardTrial version9 (hashes."standard-trial_9" or "sha256-c63gKUyawW0bwJMsSvnwoZtsNseQO+1GqFM0bgx2sko=");
   stage-trial_9 = mkStageTrial version9 (hashes."stage-trial_9" or lib.fakeHash);
 
   standard_8 = mkStandard version8 (hashes.standard_8 or "sha256-ZDGB/SOOz+sWz7P+sNzyaipEH452n8zq5LleO3ztSXc=");

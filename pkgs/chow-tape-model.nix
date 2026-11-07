@@ -27,7 +27,6 @@
   libuuid,
   libxkbcommon,
   lv2,
-  pcre,
   pcre2,
   pkg-config,
   python3,
@@ -77,7 +76,6 @@ stdenv.mkDerivation (finalAttrs: {
     libuuid
     libxkbcommon
     lv2
-    pcre
     pcre2
     python3
     sqlite

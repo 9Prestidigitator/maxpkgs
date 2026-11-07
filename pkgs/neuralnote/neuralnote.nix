@@ -20,14 +20,14 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "neuralnote";
-  version = "2.1.0";
+  version = "2.2.0";
 
   src = fetchFromGitHub {
     owner = "DamRsn";
     repo = "NeuralNote";
     tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
-    hash = "sha256-5r+MxLof+hKZf+koMJG+qdOBdHsv8AI0l/+WJTTISVM=";
+    hash = "sha256-gepbVHxvrklHmMqMAGBNuoBe+/KpMW22CdmqIWRezpE=";
   };
 
   nativeBuildInputs = [
@@ -72,11 +72,13 @@ stdenv.mkDerivation (finalAttrs: {
     url = "https://raw.githubusercontent.com/musescore/MuseScore/45924076871483cb96b859cc374c5fbdbf76ba53/share/sound/FluidR3Mono_GM.sf3";
     sha256 = "cfcd66d89e8386823400eca64934b14fbea7bf48ba1f00d21189af1262794ec2";
   };
+  # Match MUSCRIPTOR_GGML_COMMIT in the bundled muscriptor.cpp, including its
+  # Metal private-buffer fixes; this release depends on the upstream fork.
   ggmlSrc = fetchFromGitHub {
-    owner = "ggml-org";
+    owner = "DamRsn";
     repo = "ggml";
-    rev = "e91ded11bdcd78c42f9c8d3978ff6686eb4c1226";
-    hash = "sha256-QArqnQ5//Ft9Knm1Caqz68t4ikNQnk+O+OZUTfZlVCk=";
+    rev = "b01bbb837ebb3a211e133566324fa7631ee723de";
+    hash = "sha256-coRRLeN+72+sVjHNQ1VBh77ocUTDI67WnZ0zGsaUeI4=";
   };
 
   cmakeFlags =
