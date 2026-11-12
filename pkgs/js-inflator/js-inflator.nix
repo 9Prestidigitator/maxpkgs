@@ -115,6 +115,7 @@ stdenv.mkDerivation (finalAttrs: {
     ++ lib.optionals stdenv.hostPlatform.isDarwin [
       "-DXCODE_VERSION=15"
       "-DSMTG_RUN_VST_VALIDATOR=OFF"
+      "-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0"
     ];
 
   installPhase =
