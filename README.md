@@ -107,6 +107,24 @@ On macOS this opens the native universal app, installed under
 `Applications/Guitar Pro 8.app`. The `guitar-pro8` command can also open score
 files, for example `guitar-pro8 song.gp`.
 
+The macOS package includes the full RSE soundbanks (about 923 MiB extracted).
+The command-line launcher passes their Nix-store path to Guitar Pro, so no
+separate soundbank installation is needed. Quit any already-running Guitar Pro
+instance before first launching with `guitar-pro8`.
+
+For launches directly from Finder, link the packaged banks into the vendor's
+standard system location once after installing the package:
+
+```sh
+sudo "$(command -v guitar-pro8-install-soundbanks)"
+```
+
+This links `/Library/Application Support/Arobas Music/Soundbanks/com.arobas-music.soundbank.standard`
+to the package output. The helper preserves existing soundbank installations
+and unrelated symlinks. Run it again after upgrading or rolling back the package
+to update its managed link. Keep the package installed in a Nix profile while
+using this link so garbage collection retains its target.
+
 On x86_64 Linux, `nix run .#guitar-pro8` (or `guitar-pro8-install` from your
 profile) opens the Windows installer with Wine. Installation is interactive and
 only happens when you run the helper. It defaults to
@@ -124,17 +142,17 @@ your own Wine setup. The helper uses `wineWow64Packages.stable` by default;
 different Wine package. After installation, launch the installed application
 through that same Wine prefix; running the helper again opens the installer.
 
-These are the application-only downloads from Arobas Music's public update
-feed. RSE soundbanks are not bundled: use the vendor's full installer to install
-them separately (on Linux, in the same Wine prefix), or use MIDI playback.
+The Linux installer is the application-only download from Arobas Music's public
+update feed. On Linux, use the vendor's full installer to install RSE soundbanks
+separately in the same Wine prefix, or use MIDI playback.
 See the [official soundbank installation instructions](https://support.guitar-pro.com/hc/en-us/articles/19088288716957-GP8-No-sound-during-playback-with-Guitar-Pro-8).
 Normal trial/license activation applies. Wine compatibility and native macOS
 runtime behavior have not been verified here.
 
-Downloads are hash-pinned. The fetcher obtains a fresh signed URL and checks the
-expected version; if the vendor removes that version from its update feed, a
-new version/hash or an `overrideAttrs` supplying the matching local `src` archive
-is required. Update the macOS application through Nix rather than the in-app
+Downloads are hash-pinned. The Windows fetcher obtains a fresh signed URL and
+checks the expected version; macOS fetches the full vendor `.pkg` installer.
+If either upstream download changes, update the version/hash or use
+`overrideAttrs` to supply a matching local `src`. Update the macOS application through Nix rather than the in-app
 updater, since its app bundle is in the read-only Nix store.
 
 ## Plugin Paths
