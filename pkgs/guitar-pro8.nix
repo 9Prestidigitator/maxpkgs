@@ -5,6 +5,7 @@
   python3,
   cacert,
   libarchive,
+  xar,
   coreutils,
   writeShellScript,
   wineWow64Packages,
@@ -52,7 +53,7 @@ in {
         '';
       };
 
-  nativeBuildInputs = lib.optionals isDarwin [libarchive];
+  nativeBuildInputs = lib.optionals isDarwin [libarchive xar];
   dontUnpack = true;
   dontConfigure = true;
   dontBuild = true;
@@ -64,7 +65,9 @@ in {
     then ''
       runHook preInstall
       mkdir -p unpacked payload "$out/Applications" "$out/bin"
-      bsdtar -xf "$src" -C unpacked
+      # Darwin libarchive can lack xar support; use a dedicated extractor for
+      # the outer .pkg, then bsdtar for its compressed cpio payloads.
+      xar -xf "$src" -C unpacked
       bsdtar -xf unpacked/guitarpro.pkg/Payload -C payload
       cp -R "payload/Guitar Pro 8.app" "$out/Applications/"
       soundbanks="$out/Library/Application Support/Arobas Music/Soundbanks"
