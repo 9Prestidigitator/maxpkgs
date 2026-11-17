@@ -95,7 +95,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Free acoustic drum sampler VST3 plugin";
     homepage = "https://www.powerdrumkit.com/";
     license = lib.licenses.unfree;
-    maintainers = with lib.maintainers; [9 prestidigitator];
+    maintainers = with lib.maintainers; [_9prestidigitator];
     platforms = ["x86_64-linux" "aarch64-darwin"];
     sourceProvenance = [lib.sourceTypes.binaryNativeCode];
   };

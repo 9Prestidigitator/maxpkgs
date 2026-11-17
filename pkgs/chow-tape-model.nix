@@ -152,7 +152,11 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://github.com/jatinchowdhury18/AnalogTapeModel";
     description = "Physical modelling signal processing for analog tape recording";
     license = with lib.licenses; [gpl3Only];
-    platforms = ["x86_64-linux" "aarch64-linux" "aarch64-darwin"];
+    platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "aarch64-darwin"
+    ];
     mainProgram = "CHOWTapeModel";
   };
 })

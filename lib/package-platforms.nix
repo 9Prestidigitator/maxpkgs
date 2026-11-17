@@ -43,7 +43,7 @@
       auburn-sounds-renegate = withPassthru auburnSoundsPackages.renegate.default auburnSoundsPackages.renegate;
       auburn-sounds-selene = withPassthru auburnSoundsPackages.selene.default auburnSoundsPackages.selene;
       bitwig6 = callPackage ../pkgs/bitwig6.nix {};
-      chow-tape-model = callPackage ../pkgs/chow-tape-model.nix {};
+      chow-tape-model-src = callPackage ../pkgs/chow-tape-model.nix {};
       drumgizmo = callPackage ../pkgs/drumgizmo.nix {};
       drumlocker = callPackage ../pkgs/drumlocker.nix {};
       gvst = callPackage ../pkgs/gvst.nix {};
@@ -69,7 +69,7 @@
       pianoteq-stage = pianoteqPackages.stage;
       pianoteq-trial = pianoteqPackages.trial;
       rubberband = callPackage ../pkgs/rubberband.nix {};
-      serum2 = callPackage ../pkgs/serum2.nix {};
+      serum2-bin = callPackage ../pkgs/serum2.nix {};
       spice-oss = callPackage ../pkgs/spice-oss.nix {};
       tone3000-bin = callPackage ../pkgs/tone3000-bin.nix {};
       ultimate-vocal-remover-gui = callPackage ../pkgs/ultimate-vocal-remover-gui.nix {};
