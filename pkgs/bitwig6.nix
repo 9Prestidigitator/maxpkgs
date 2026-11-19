@@ -48,7 +48,7 @@ in {
     then {
       name = "bitwig-studio-${finalAttrs.version}.dmg";
       url = "https://www.bitwig.com/dl/Bitwig%20Studio/${urlVersion}/installer_mac/";
-      hash = "sha256-oCwkQyAQtkqyQI5XmNxexMOKjzLdsIWaHi2AiDHb2gA=";
+      hash = "sha256-/ShcV6ir4JlNLef6pU1ZiL6XtaLcO4VCFz3opHgscts=";
     }
     else {
       name = "bitwig-studio-${finalAttrs.version}.deb";
